@@ -8,7 +8,6 @@ import {createCostTemplate} from './view/cost';
 import {createPointTemplate} from './view/point';
 import {createPointFormTemplate} from './view/point-form';
 
-
 const POINT_COUNT = 3;
 
 const mainElement = document.querySelector('.trip-main');
