@@ -7,8 +7,10 @@ import {createRouteTemplate} from './view/route';
 import {createCostTemplate} from './view/cost';
 import {createPointTemplate} from './view/point';
 import {createPointFormTemplate} from './view/point-form';
+import {generatePoint} from './mock/point';
 
-const POINT_COUNT = 3;
+const POINT_COUNT = 20;
+const POINTS = new Array(POINT_COUNT).fill(null).map(() => generatePoint());
 
 const mainElement = document.querySelector('.trip-main');
 const navigationElement = document.querySelector('.trip-controls__navigation');
@@ -28,10 +30,10 @@ render(tripEventsElement, createPointListTemplate(), 'beforeend');
 const tripInfoElement = mainElement.querySelector('.trip-info');
 const pointListElement = tripEventsElement.querySelector('.trip-events__list');
 
-render(tripInfoElement, createRouteTemplate(), 'beforeend');
-render(tripInfoElement, createCostTemplate(), 'beforeend');
-render(pointListElement, createPointFormTemplate(), 'beforeend');
+render(tripInfoElement, createRouteTemplate(POINTS), 'beforeend');
+render(tripInfoElement, createCostTemplate(POINTS), 'beforeend');
+render(pointListElement, createPointFormTemplate(POINTS[0]), 'beforeend');
 
-for (let i = 0; i < POINT_COUNT; i++) {
-  render(pointListElement, createPointTemplate(), 'beforeend');
+for (let i = 1; i < POINT_COUNT; i++) {
+  render(pointListElement, createPointTemplate(POINTS[i]), 'beforeend');
 }
