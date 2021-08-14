@@ -1,7 +1,16 @@
 import {POINT_TYPE, DESTINATIONS} from '../const';
 import {DESTINATIONS_INFO} from '../mock/destination';
-import {formatDate} from '../utils';
+import {createElement, formatDate} from '../utils';
 import {OFFERS_BY_TYPE} from '../mock/offer';
+
+const BLANK_POINT = {
+  type: POINT_TYPE[0],
+  destination: DESTINATIONS[0],
+  dateStart: null,
+  dateEnd: null,
+  price: '',
+  offers: [],
+};
 
 const createTypeTemplate = () =>
   POINT_TYPE.map((point) => `<div class="event__type-item">
@@ -50,15 +59,8 @@ const createDescriptionTemplate = (destination) => {
     : '';
 };
 
-export const createPointFormTemplate = (point = {}) => {
-  const {
-    type = POINT_TYPE[0],
-    destination = DESTINATIONS[0],
-    dateStart = null,
-    dateEnd = null,
-    price = '',
-    offers = [],
-  } = point;
+const createPointFormTemplate = (point) => {
+  const {type, destination, dateStart, dateEnd, price, offers} = point;
 
   return `<li class="trip-events__item">
     <form class="event event--edit" action="#" method="post">
@@ -66,7 +68,7 @@ export const createPointFormTemplate = (point = {}) => {
         <div class="event__type-wrapper">
           <label class="event__type  event__type-btn" for="event-type-toggle-1">
             <span class="visually-hidden">Choose event type</span>
-            <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
+            <img class="event__type-icon" width="17" height="17" src="img/icons/${type.toLowerCase()}.png" alt="Event type icon">
           </label>
           <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
@@ -118,3 +120,27 @@ export const createPointFormTemplate = (point = {}) => {
     </form>
   </li>`;
 };
+
+export default class PointForm {
+  constructor(point = BLANK_POINT) {
+    this._point = point;
+    this._element = null;
+  }
+
+  _getTemplate() {
+    return createPointFormTemplate(this._point);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this._getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
+

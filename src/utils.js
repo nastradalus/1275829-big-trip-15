@@ -5,6 +5,11 @@ const HOURS_ROUND = 60;
 const DAYS_ROUND = 24;
 const NUMBER_LIMIT_WITHOUT_ZERO = 10;
 
+export const RenderPosition = {
+  AFTER_BEGIN: 'afterbegin',
+  BEFORE_END: 'beforeend',
+};
+
 export const getRandomInteger = (a = 0, b = 1) => {
   const lower = Math.ceil(Math.min(a, b));
   const upper = Math.floor(Math.max(a, b));
@@ -67,4 +72,22 @@ export const getRoutePeriod = (start, end) => {
   return `${startDate.format(DateFormat.SHORT)}&nbsp;—&nbsp;${(startDate.get('month') !== endDate.get('month'))
     ? endDate.format(DateFormat.SHORT)
     : endDate.format(DateFormat.ONLY_DAY)}`;
+};
+
+export const render = (container, element, place) => {
+  switch (place) {
+    case RenderPosition.AFTER_BEGIN:
+      container.prepend(element);
+      break;
+    case RenderPosition.BEFORE_END:
+      container.append(element);
+      break;
+  }
+};
+
+export const createElement = (template) => {
+  const newElement = document.createElement('div');
+  newElement.innerHTML = template;
+
+  return newElement.firstChild;
 };

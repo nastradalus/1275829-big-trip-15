@@ -1,8 +1,8 @@
-import {getRoutePeriod} from '../utils';
+import {createElement, getRoutePeriod} from '../utils';
 
-const MAX_POINT_IN_ROUTE_COUNT = 3;
+const MAX_POINT_COUNT_IN_ROUTE = 3;
 
-export const createRouteTemplate = (points = []) => {
+const createRouteTemplate = (points = []) => {
   const routePoints = [];
   const startDates = [];
   const endDates = [];
@@ -20,7 +20,7 @@ export const createRouteTemplate = (points = []) => {
     }
   });
 
-  const route = routePoints.length <= MAX_POINT_IN_ROUTE_COUNT
+  const route = routePoints.length <= MAX_POINT_COUNT_IN_ROUTE
     ? routePoints.join(' — ')
     : `${routePoints[0]}  — ... — ${routePoints[routePoints.length - 1]}`;
 
@@ -32,3 +32,27 @@ export const createRouteTemplate = (points = []) => {
       <p class="trip-info__dates">${routePeriod}</p>
     </div>`;
 };
+
+export default class Route {
+  constructor(points) {
+    this._points = points;
+    this._element = null;
+  }
+
+  _getTemplate() {
+    return createRouteTemplate(this._points);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this._getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
+
