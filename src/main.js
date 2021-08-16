@@ -12,7 +12,6 @@ import {generatePoint} from './mock/point';
 import {render, RenderPosition} from './utils';
 
 const POINT_COUNT = 20;
-
 const points = new Array(POINT_COUNT).fill(null).map(() => generatePoint());
 
 const mainElement = document.querySelector('.trip-main');
