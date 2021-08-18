@@ -9,7 +9,7 @@ import PointView from './view/point';
 import PointFormView from './view/point-form';
 import NoPointView from './view/no-point';
 import {generatePoint} from './mock/point';
-import {render, RenderPosition} from './utils';
+import {render, RenderPosition, replace} from './utils/render';
 
 const POINT_COUNT = 20;
 const points = new Array(POINT_COUNT).fill(null).map(() => generatePoint());
@@ -23,14 +23,14 @@ const renderPoint = (pointListElement, point) => {
   const pointComponent = new PointView(point);
   const pointFormComponent = new PointFormView(point);
 
-  render(pointListElement, pointComponent.getElement(), RenderPosition.BEFORE_END);
+  render(pointListElement, pointComponent, RenderPosition.BEFORE_END);
 
   const replacePointToForm = () => {
-    pointListElement.replaceChild(pointFormComponent.getElement(), pointComponent.getElement());
+    replace(pointFormComponent, pointComponent);
   };
 
   const replaceFormToPoint = () => {
-    pointListElement.replaceChild(pointComponent.getElement(), pointFormComponent.getElement());
+    replace(pointComponent, pointFormComponent);
   };
 
   const onEscKeyDown = (evt) => {
@@ -41,17 +41,17 @@ const renderPoint = (pointListElement, point) => {
     }
   };
 
-  pointComponent.getElement().querySelector('.event__rollup-btn').addEventListener('click', () => {
+  pointComponent.setClickHandler(() => {
     replacePointToForm();
     document.addEventListener('keydown', onEscKeyDown);
   });
 
-  pointFormComponent.getElement().querySelector('form').addEventListener('submit', () => {
+  pointFormComponent.setSubmitHandler(() => {
     replaceFormToPoint();
     document.removeEventListener('keydown', onEscKeyDown);
   });
 
-  pointFormComponent.getElement().querySelector('.event__rollup-btn').addEventListener('click', () => {
+  pointFormComponent.setClickHandler(() => {
     replaceFormToPoint();
     document.removeEventListener('keydown', onEscKeyDown);
   });
@@ -61,34 +61,31 @@ const renderTripInfo = (tripInfoElement, tripPoints) => {
   const routeComponent = new RouteView(tripPoints);
   const costComponent = new CostView(tripPoints);
 
-  render(tripInfoElement, routeComponent.getElement(), RenderPosition.BEFORE_END);
-  render(tripInfoElement, costComponent.getElement(), RenderPosition.BEFORE_END);
+  render(tripInfoElement, routeComponent, RenderPosition.BEFORE_END);
+  render(tripInfoElement, costComponent, RenderPosition.BEFORE_END);
 };
 
-const renderTrip = (tripElement, tripListElement, tripPoints) => {
+const renderTrip = (tripMainElement, tripListElement, tripPoints) => {
   if (tripPoints.length) {
     const tripInfoComponent = new TripInfoView();
     const sortComponent = new SortView();
     const pointListComponent = new PointListView();
 
-    render(tripElement, tripInfoComponent.getElement(), RenderPosition.AFTER_BEGIN);
-    render(tripListElement, sortComponent.getElement(), RenderPosition.BEFORE_END);
-    render(tripListElement, pointListComponent.getElement(), RenderPosition.BEFORE_END);
+    render(tripMainElement, tripInfoComponent, RenderPosition.AFTER_BEGIN);
+    render(tripListElement, sortComponent, RenderPosition.BEFORE_END);
+    render(tripListElement, pointListComponent, RenderPosition.BEFORE_END);
 
-    const tripInfoElement = tripElement.querySelector('.trip-info');
-    const pointListElement = tripListElement.querySelector('.trip-events__list');
-
-    renderTripInfo(tripInfoElement, tripPoints);
+    renderTripInfo(tripInfoComponent, tripPoints);
 
     tripPoints.forEach((tripPoint) => {
-      renderPoint(pointListElement, tripPoint);
+      renderPoint(pointListComponent, tripPoint);
     });
   } else {
-    render(tripEventsElement, new NoPointView().getElement(), RenderPosition.BEFORE_END);
+    render(tripEventsElement, new NoPointView(), RenderPosition.BEFORE_END);
   }
 };
 
-render(filtersElement, new FilterView().getElement(), RenderPosition.BEFORE_END);
-render(navigationElement, new MenuView().getElement(), RenderPosition.BEFORE_END);
+render(filtersElement, new FilterView(), RenderPosition.BEFORE_END);
+render(navigationElement, new MenuView(), RenderPosition.BEFORE_END);
 
 renderTrip(mainElement, tripEventsElement, points);

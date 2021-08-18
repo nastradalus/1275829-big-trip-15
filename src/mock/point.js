@@ -1,5 +1,5 @@
 import {POINT_TYPE, DESTINATIONS} from '../const';
-import {generateDatePeriod, getRandomArrayElement, getRandomArrayElements, getRandomInteger} from '../utils';
+import {generateDatePeriod, getRandomArrayElement, getRandomArrayElements, getRandomInteger} from '../utils/common';
 import {OFFERS_BY_TYPE} from './offer';
 
 const generateType = () => getRandomArrayElement(POINT_TYPE);
