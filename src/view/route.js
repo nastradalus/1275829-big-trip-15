@@ -1,4 +1,5 @@
-import {createElement, getRoutePeriod} from '../utils';
+import {getRoutePeriod} from '../utils/common';
+import AbstractView from './abstract';
 
 const MAX_POINT_COUNT_IN_ROUTE = 3;
 
@@ -33,26 +34,14 @@ const createRouteTemplate = (points = []) => {
     </div>`;
 };
 
-export default class Route {
+export default class Route extends AbstractView {
   constructor(points) {
+    super();
     this._points = points;
-    this._element = null;
   }
 
-  _getTemplate() {
+  getTemplate() {
     return createRouteTemplate(this._points);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this._getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
 

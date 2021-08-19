@@ -1,4 +1,4 @@
-import {createElement} from '../utils';
+import AbstractView from './abstract';
 
 const OBJECT_VALUE_INDEX = 1;
 
@@ -13,25 +13,13 @@ const createCostTemplate = (points = []) => {
     </p>`;
 };
 
-export default class Cost {
+export default class Cost extends AbstractView {
   constructor(points) {
+    super();
     this._points = points;
-    this._element = null;
   }
 
-  _getTemplate() {
+  getTemplate() {
     return createCostTemplate(this._points);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this._getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

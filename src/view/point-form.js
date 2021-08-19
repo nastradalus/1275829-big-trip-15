@@ -1,7 +1,8 @@
 import {POINT_TYPE, DESTINATIONS} from '../const';
 import {DESTINATIONS_INFO} from '../mock/destination';
-import {createElement, formatDate} from '../utils';
+import {formatDate} from '../utils/common';
 import {OFFERS_BY_TYPE} from '../mock/offer';
+import AbstractView from './abstract';
 
 const BLANK_POINT = {
   type: POINT_TYPE[0],
@@ -121,26 +122,36 @@ const createPointFormTemplate = (point) => {
   </li>`;
 };
 
-export default class PointForm {
+export default class PointForm extends AbstractView {
   constructor(point = BLANK_POINT) {
+    super();
     this._point = point;
-    this._element = null;
+    this._clickHandler = this._clickHandler.bind(this);
+    this._submitHandler = this._submitHandler.bind(this);
   }
 
-  _getTemplate() {
+  _clickHandler(evt) {
+    evt.preventDefault();
+    this._callback.click();
+  }
+
+  _submitHandler(evt) {
+    evt.preventDefault();
+    this._callback.submit();
+  }
+
+  getTemplate() {
     return createPointFormTemplate(this._point);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this._getTemplate());
-    }
-
-    return this._element;
+  setClickHandler(callback) {
+    this._callback.click = callback;
+    this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._clickHandler);
   }
 
-  removeElement() {
-    this._element = null;
+  setSubmitHandler(callback) {
+    this._callback.submit = callback;
+    this.getElement().querySelector('form').addEventListener('submit', this._submitHandler);
   }
 }
 

@@ -1,5 +1,5 @@
 import {DESCRIPTIONS, DESTINATIONS} from '../const';
-import {getRandomArrayElements, getRandomInteger} from '../utils';
+import {getRandomArrayElements, getRandomInteger} from '../utils/common';
 
 const generatePhotos = () => new Array(getRandomInteger(0, 15)).fill(null).map(() => `http://picsum.photos/248/152?r=${getRandomInteger(0, 255)}`);
 

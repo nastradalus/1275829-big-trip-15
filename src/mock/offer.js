@@ -1,5 +1,5 @@
 import {OFFERS, POINT_TYPE} from '../const';
-import {getRandomArrayElements} from '../utils';
+import {getRandomArrayElements} from '../utils/common';
 
 const generateTypeOffers = () => {
   const offersByType = {};
