@@ -83,7 +83,7 @@ export const updateItem = (items, update) => {
   ];
 };
 
-export const sortPointByDay = (point1, point2) => dayjs(point2.dateStart).diff(dayjs(point1.dateStart));
+export const sortPointByDay = (point1, point2) => dayjs(point1.dateStart).diff(dayjs(point2.dateStart));
 
 export const sortPointByTime = (point1, point2) => {
   const pointDuration1 = dayjs(point1.dateEnd).diff(dayjs(point1.dateStart));
