@@ -69,4 +69,27 @@ export const getRoutePeriod = (start, end) => {
     : endDate.format(DateFormat.ONLY_DAY)}`;
 };
 
+export const updateItem = (items, update) => {
+  const index = items.findIndex((item) => item.id === update.id);
 
+  if (index === -1) {
+    return items;
+  }
+
+  return [
+    ...items.slice(0, index),
+    update,
+    ...items.slice(index + 1),
+  ];
+};
+
+export const sortPointByDay = (point1, point2) => dayjs(point2.dateStart).diff(dayjs(point1.dateStart));
+
+export const sortPointByTime = (point1, point2) => {
+  const pointDuration1 = dayjs(point1.dateEnd).diff(dayjs(point1.dateStart));
+  const pointDuration2 = dayjs(point2.dateEnd).diff(dayjs(point2.dateStart));
+
+  return pointDuration2 - pointDuration1;
+};
+
+export const sortPointByPrice = (point1, point2) => point2.price - point1.price;

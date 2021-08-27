@@ -127,17 +127,17 @@ export default class PointForm extends AbstractView {
     super();
     this._point = point;
     this._clickHandler = this._clickHandler.bind(this);
-    this._submitHandler = this._submitHandler.bind(this);
+    this._formSubmitHandler = this._formSubmitHandler.bind(this);
   }
 
   _clickHandler(evt) {
     evt.preventDefault();
-    this._callback.click();
+    this._callback.click(this._point);
   }
 
-  _submitHandler(evt) {
+  _formSubmitHandler(evt) {
     evt.preventDefault();
-    this._callback.submit();
+    this._callback.submit(this._point);
   }
 
   getTemplate() {
@@ -151,7 +151,7 @@ export default class PointForm extends AbstractView {
 
   setSubmitHandler(callback) {
     this._callback.submit = callback;
-    this.getElement().querySelector('form').addEventListener('submit', this._submitHandler);
+    this.getElement().querySelector('form').addEventListener('submit', this._formSubmitHandler);
   }
 }
 
