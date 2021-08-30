@@ -11,6 +11,7 @@ export const DESCRIPTIONS = [
   'Aliquam erat volutpat.',
   'Nunc fermentum tortor ac porta dapibus. In rutrum ac purus sit amet tempus.',
 ];
+
 export const DateFormat = {
   ONLY_DATE: 'YYYY-MM-DD',
   ONLY_TIME: 'HH:mm',
@@ -19,6 +20,7 @@ export const DateFormat = {
   SHORT: 'MMM D',
   DATETIME: 'YYYY-MM-DDTHH:mm',
 };
+
 export const OFFERS = [
   {
     code: 'luggage',
@@ -46,3 +48,9 @@ export const OFFERS = [
     price: 40,
   },
 ];
+
+export const SortType = {
+  BY_DAY: 'sort-day',
+  BY_TIME: 'sort-time',
+  BY_PRICE: 'sort-price',
+};
