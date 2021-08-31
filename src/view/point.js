@@ -1,25 +1,29 @@
 import {formatDate, getTimeDuration} from '../utils/common';
 import {DateFormat} from '../const';
 import AbstractView from './abstract';
+import {OFFERS_BY_TYPE} from '../mock/offer';
 
 const FAVORITE_CLASS = 'event__favorite-btn--active';
 
-const createOffersTemplate = (offers) =>
-  offers.length
+const createOffersTemplate = (offers, type) => {
+  const fullOffers = OFFERS_BY_TYPE[type].filter(({code}) => offers.includes(code));
+
+  return fullOffers.length
     ? `<h4 class="visually-hidden">Offers:</h4>
       <ul class="event__selected-offers">
-        ${offers.map(({description, price}) => `<li class="event__offer">
+        ${fullOffers.map(({description, price}) => `<li class="event__offer">
            <span class="event__offer-title">${description}</span>
             +€&nbsp;
            <span class="event__offer-price">${price}</span>
          </li>`).join('')}
       </ul>`
     : '';
+};
 
 const createPointTemplate = (point) => {
   const {dateStart, dateEnd, type, destination, price, offers, isFavorite} = point;
   const duration = getTimeDuration(dateStart, dateEnd);
-  const offersTemplate = createOffersTemplate(offers);
+  const offersTemplate = createOffersTemplate(offers, type);
   const favoriteClassName = isFavorite ? FAVORITE_CLASS : '';
 
   return `<li class="trip-events__item">

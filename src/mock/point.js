@@ -18,7 +18,7 @@ export const generatePoint = () => {
     dateStart,
     dateEnd,
     price: getRandomInteger(300, 1500),
-    offers: getRandomArrayElements(OFFERS_BY_TYPE[type]),
+    offers: getRandomArrayElements(OFFERS_BY_TYPE[type]).map(({code}) => code),
     isFavorite: Boolean(getRandomInteger(0, 1)),
   };
 };
