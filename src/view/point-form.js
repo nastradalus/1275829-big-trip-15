@@ -37,7 +37,7 @@ const createOffersTemplate = (currentOffers, type) => {
 
       ${typeOffers.map(({code, description, price}) => `<div class="event__available-offers">
         <div class="event__offer-selector">
-          <input class="event__offer-checkbox  visually-hidden" id="event-offer-${code}-1" data-value="${code}"
+          <input class="event__offer-checkbox visually-hidden" id="event-offer-${code}-1" data-value="${code}"
                  type="checkbox" name="event-offer-${code}" ${currentOffers.includes(code) ? 'checked' : ''}>
           <label class="event__offer-label" for="event-offer-${code}-1">
             <span class="event__offer-title">${description}</span>
@@ -104,10 +104,10 @@ const createPointFormTemplate = (data) => {
 
         <div class="event__field-group  event__field-group--time">
           <label class="visually-hidden" for="event-start-time-1">From</label>
-          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${dateStart ? formatDate(dateStart) : ''}">
+          <input class="event__input  event__input--time event__input--date-start" id="event-start-time-1" type="text" name="event-start-time" value="${dateStart ? formatDate(dateStart) : ''}">
           —
           <label class="visually-hidden" for="event-end-time-1">To</label>
-          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${dateEnd ? formatDate(dateEnd) : ''}">
+          <input class="event__input  event__input--time event__input--date-end" id="event-end-time-1" type="text" name="event-end-time" value="${dateEnd ? formatDate(dateEnd) : ''}">
         </div>
 
         <div class="event__field-group  event__field-group--price">
@@ -167,22 +167,22 @@ export default class PointForm extends SmartView {
 
   _setInnerHandlers() {
     this.getElement()
-      .querySelector('input[name=\'event-price\']')
+      .querySelector('.event__input--price')
       .addEventListener('change', this._priceChangeHandler);
     this.getElement()
-      .querySelector('input[name=\'event-start-time\']')
+      .querySelector('.event__input--date-start')
       .addEventListener('input', this._dateStartInputHandler);
     this.getElement()
-      .querySelector('input[name=\'event-end-time\']')
+      .querySelector('.event__input--date-end')
       .addEventListener('input', this._dateEndInputHandler);
     this.getElement()
-      .querySelector('input[name=\'event-destination\']')
+      .querySelector('.event__input--destination')
       .addEventListener('input', this._destinationInputHandler);
     this.getElement()
-      .querySelectorAll('input[name*=\'event-offer\']')
+      .querySelectorAll('.event__offer-checkbox')
       .forEach((field) => field.addEventListener('change', this._offersChangeHandler));
     this.getElement()
-      .querySelectorAll('input[name=\'event-type\']')
+      .querySelectorAll('.event__type-input')
       .forEach((field) => field.addEventListener('change', this._typeChangeHandler));
     this._setStartDatepicker();
     this._setEndDatepicker();
@@ -195,7 +195,7 @@ export default class PointForm extends SmartView {
     }
 
     this._startDatepicker = flatpickr(
-      this.getElement().querySelector('input[name=\'event-start-time\']'),
+      this.getElement().querySelector('.event__input--date-start'),
       {
         dateFormat: DateFormat.FLATPICKR,
         defaultDate: this._data.dateStart,
@@ -213,7 +213,7 @@ export default class PointForm extends SmartView {
     }
 
     this._endDatepicker = flatpickr(
-      this.getElement().querySelector('input[name=\'event-end-time\']'),
+      this.getElement().querySelector('.event__input--date-end'),
       {
         dateFormat: DateFormat.FLATPICKR,
         defaultDate: this._data.dateEnd,
@@ -269,7 +269,7 @@ export default class PointForm extends SmartView {
   _offersChangeHandler(evt) {
     evt.preventDefault();
     const checkedCodes = [...this.getElement()
-      .querySelectorAll('input[name*=\'event-offer\']:checked')]
+      .querySelectorAll('.event__offer-checkbox:checked')]
       .map((field) => field.dataset.value);
 
     this.updateData({
