@@ -17,6 +17,7 @@ export const DateFormat = {
   ONLY_TIME: 'HH:mm',
   ONLY_DAY: 'D',
   FULL: 'DD/MM/YY HH:mm',
+  FLATPICKR: 'd/m/y H:i',
   SHORT: 'MMM D',
   DATETIME: 'YYYY-MM-DDTHH:mm',
 };

@@ -3,6 +3,7 @@ import {DateFormat} from '../const';
 
 const HOURS_ROUND = 60;
 const DAYS_ROUND = 24;
+const MONTH_ROUND = 30;
 const NUMBER_LIMIT_WITHOUT_ZERO = 10;
 
 export const getRandomInteger = (a = 0, b = 1) => {
@@ -48,6 +49,11 @@ export const getTimeDuration = (start, end) => {
   const endDate = dayjs(end);
   const durationMinute = endDate.diff(startDate, 'minute') % HOURS_ROUND;
   const durationHour = endDate.diff(startDate, 'hour') % DAYS_ROUND;
+  const durationDays = endDate.diff(startDate, 'day') % MONTH_ROUND;
+
+  if (durationDays) {
+    timeDifferences.push(`${durationDays}D`);
+  }
 
   if (durationHour) {
     timeDifferences.push(`${fillByZero(durationHour)}H`);
