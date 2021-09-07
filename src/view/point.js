@@ -1,3 +1,4 @@
+import he from 'he';
 import {formatDate, getTimeDuration} from '../utils/common';
 import {DateFormat} from '../const';
 import AbstractView from './abstract';
@@ -32,7 +33,7 @@ const createPointTemplate = (point) => {
       <div class="event__type">
         <img class="event__type-icon" width="42" height="42" src="img/icons/${type.toLowerCase()}.png" alt="Event type icon">
       </div>
-      <h3 class="event__title">${type} ${destination}</h3>
+      <h3 class="event__title">${type} ${he.encode(destination)}</h3>
       <div class="event__schedule">
         <p class="event__time">
           <time class="event__start-time" datetime="${formatDate(dateStart, DateFormat.DATETIME)}">${formatDate(dateStart, DateFormat.ONLY_TIME)}</time>
@@ -42,7 +43,7 @@ const createPointTemplate = (point) => {
         <p class="event__duration">${duration}</p>
       </div>
       <p class="event__price">
-        €&nbsp;<span class="event__price-value">${price}</span>
+        €&nbsp;<span class="event__price-value">${he.encode(price.toString())}</span>
       </p>
       ${offersTemplate}
       <button class="event__favorite-btn ${favoriteClassName}" type="button">

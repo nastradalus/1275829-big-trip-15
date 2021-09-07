@@ -1,12 +1,28 @@
 import AbstractView from './abstract';
+import {OFFERS_BY_TYPE} from '../mock/offer';
 
-const OBJECT_VALUE_INDEX = 1;
+const getOfferPrices = ({type, offers}) => {
+  let offerPrice = 0;
+
+  if (!offers.length) {
+    return offerPrice;
+  }
+
+  OFFERS_BY_TYPE[type].forEach(({code, price}) => {
+    if (offers.includes(code)) {
+      offerPrice += price;
+    }
+  });
+
+  return offerPrice;
+};
 
 const createCostTemplate = (points = []) => {
-  const price = points.reduce((previousValue, currentPoint, index) =>
-    (index === OBJECT_VALUE_INDEX)
-      ? previousValue.price + currentPoint.price
-      : previousValue + currentPoint.price);
+  let price = 0;
+
+  points.forEach((point) => {
+    price += point.price + getOfferPrices(point);
+  });
 
   return `<p class="trip-info__cost">
       Total: €&nbsp;<span class="trip-info__cost-value">${price}</span>
