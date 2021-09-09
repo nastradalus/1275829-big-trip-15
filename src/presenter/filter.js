@@ -1,6 +1,7 @@
 import FilterView from '../view/filter.js';
 import {render, RenderPosition, replace, remove} from '../utils/render.js';
 import {FilterType, UpdateType} from '../const.js';
+import {isFuturePoint} from "../utils/common";
 
 const FilterName = {
   [FilterType.EVERYTHING]: 'Everything',
@@ -8,6 +9,7 @@ const FilterName = {
   [FilterType.PAST]: 'Past',
 };
 
+//@todo добавить отключение фильтра, если элементов в фильтре нет
 export default class Filter {
   constructor(filterContainer, filterModel, pointsModel) {
     this._filterContainer = filterContainer;
@@ -24,7 +26,7 @@ export default class Filter {
   }
 
   init() {
-    const filters = this._getFilters();
+    const filters = this._getFilters(this._pointsModel.getPoints());
     const prevFilterComponent = this._filterComponent;
 
     this._filterComponent = new FilterView(filters, this._filterModel.getFilter());
@@ -48,22 +50,25 @@ export default class Filter {
       return;
     }
 
-    this._filterModel.setFilter(UpdateType.MINOR, filterType);
+    this._filterModel.setFilter(UpdateType.LIST, filterType);
   }
 
-  _getFilters() {
+  _getFilters(points) {
     return [
       {
         type: FilterType.EVERYTHING,
         name: FilterName[FilterType.EVERYTHING],
+        isAvailable: points.length,
       },
       {
         type: FilterType.FUTURE,
         name: FilterName[FilterType.FUTURE],
+        isAvailable: points.filter((point) => isFuturePoint(point.dateStart)).length,
       },
       {
         type: FilterType.PAST,
         name: FilterName[FilterType.PAST],
+        isAvailable: points.filter((point) => !isFuturePoint(point.dateStart)).length,
       },
     ];
   }

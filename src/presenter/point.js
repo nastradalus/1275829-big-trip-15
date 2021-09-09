@@ -101,7 +101,7 @@ export default class Point {
 
     this._changeData(
       UserAction.UPDATE_POINT,
-      isMajorUpdate ? UpdateType.MAJOR : UpdateType.PATCH,
+      isMajorUpdate ? UpdateType.ALL : UpdateType.POINT,
       update,
     );
     this._replaceFormToPoint();
@@ -110,7 +110,7 @@ export default class Point {
   _handleFavoriteClick() {
     this._changeData(
       UserAction.UPDATE_POINT,
-      UpdateType.PATCH,
+      UpdateType.POINT,
       Object.assign(
         {},
         this._point,
@@ -124,7 +124,7 @@ export default class Point {
   _handleDeleteClick(point) {
     this._changeData(
       UserAction.DELETE_POINT,
-      UpdateType.MAJOR,
+      UpdateType.ALL,
       point,
     );
   }

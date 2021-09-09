@@ -45,7 +45,7 @@ export default class PointNew {
   _handleFormSubmit(task) {
     this._changeData(
       UserAction.ADD_POINT,
-      UpdateType.MAJOR,
+      UpdateType.ALL,
       // Пока у нас нет сервера, который бы после сохранения
       // выдывал честный id задачи, нам нужно позаботиться об этом самим
       Object.assign({id: nanoid()}, task),

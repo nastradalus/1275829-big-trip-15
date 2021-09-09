@@ -1,10 +1,12 @@
 import dayjs from 'dayjs';
-import {DateFormat} from '../const';
+import {DateFormat, POINT_TYPE, StatisticType} from '../const';
 
 const HOURS_ROUND = 60;
 const DAYS_ROUND = 24;
 const MONTH_ROUND = 30;
 const NUMBER_LIMIT_WITHOUT_ZERO = 10;
+const TYPE_COUNT_INCREMENT = 1;
+const MAP_VALUE_INDEX = 1;
 
 export const getRandomInteger = (a = 0, b = 1) => {
   const lower = Math.ceil(Math.min(a, b));
@@ -87,3 +89,48 @@ export const sortPointByTime = (point1, point2) => {
 export const sortPointByPrice = (point1, point2) => point2.price - point1.price;
 
 export const isFuturePoint = (date) => dayjs(date) - dayjs();
+
+export const formatStatisticValue = (type, value) => {
+  switch (type) {
+    case StatisticType.MONEY:
+      return `€ ${value}`;
+    case StatisticType.TYPE:
+      return `${value}x`;
+    case StatisticType.TIME:
+      return getTimeDuration(value);
+  }
+};
+
+export const sortMap = (map) => (
+  new Map([...map.entries()].sort((value1, value2) => value2[MAP_VALUE_INDEX] - value1[MAP_VALUE_INDEX]))
+);
+
+export const getStatistic = (points) => {
+  const Statistic = {
+    [StatisticType.MONEY]: new Map(),
+    [StatisticType.TYPE]: new Map(),
+    [StatisticType.TIME]: new Map(),
+  };
+
+  POINT_TYPE.forEach((type) => {
+    Statistic[StatisticType.MONEY].set(type, 0);
+    Statistic[StatisticType.TYPE].set(type, 0);
+    Statistic[StatisticType.TIME].set(type, 0);
+  });
+
+  points.forEach(({price, type, dateStart, dateEnd}) => {
+    const moneyStats = Statistic[StatisticType.MONEY];
+    const typeStats = Statistic[StatisticType.TYPE];
+    const timeStats = Statistic[StatisticType.TIME];
+
+    moneyStats.set(type, +moneyStats.get(type) + price);
+    typeStats.set(type, +typeStats.get(type) + TYPE_COUNT_INCREMENT);
+    timeStats.set(type, +timeStats.get(type) + (dayjs(dateEnd) - dayjs(dateStart)));
+  });
+
+  return {
+    [StatisticType.MONEY]: sortMap(Statistic[StatisticType.MONEY]),
+    [StatisticType.TYPE]: sortMap(Statistic[StatisticType.TYPE]),
+    [StatisticType.TIME]: sortMap(Statistic[StatisticType.TIME]),
+  };
+};

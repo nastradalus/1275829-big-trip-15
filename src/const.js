@@ -63,9 +63,12 @@ export const UserAction = {
 };
 
 export const UpdateType = {
-  PATCH: 'PATCH',
-  MINOR: 'MINOR',
-  MAJOR: 'MAJOR',
+  POINT: 'POINT',
+  LIST: 'LIST',
+  ALL: 'ALL',
+  REMOVE_STATS: 'REMOVE_STATS',
+  REMOVE_TABLE: 'REMOVE_TABLE',
+  NEW_EVENT: 'NEW_EVENT',
 };
 
 export const FilterType = {
@@ -77,4 +80,10 @@ export const FilterType = {
 export const MenuItem = {
   TABLE: 'TABLE',
   STATS: 'STATS',
+};
+
+export const StatisticType = {
+  MONEY: 'MONEY',
+  TYPE: 'TYPE',
+  TIME: 'TIME',
 };

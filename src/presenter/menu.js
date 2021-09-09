@@ -1,22 +1,24 @@
-import {MenuItem} from '../const';
+import {MenuItem, UpdateType} from '../const';
 import {remove, render, RenderPosition, replace} from '../utils/render';
 import MenuView from '../view/menu';
 
 export default class Menu {
-  constructor(menuContainer) {
+  constructor(menuContainer, menuModel) {
     this._menuContainer = menuContainer;
-    this._menuComponent = null;
-    this._activeItem = null;
+    this._menuModel = menuModel;
 
+    this._menuComponent = null;
+
+    this._handleModelEvent = this._handleModelEvent.bind(this);
     this._handleMenuClick = this._handleMenuClick.bind(this);
+
+    this._menuModel.addObserver(this._handleModelEvent);
   }
 
-  init(menuItem) {
+  init() {
     const prevMenuComponent = this._menuComponent;
 
-    this._activeItem = menuItem;
-    this._menuComponent = new MenuView(this._activeItem);
-
+    this._menuComponent = new MenuView(this._menuModel.getMenuItem());
     this._menuComponent.setMenuClickHandler(this._handleMenuClick);
 
     if (prevMenuComponent === null) {
@@ -28,17 +30,22 @@ export default class Menu {
     remove(prevMenuComponent);
   }
 
+  _handleModelEvent() {
+    this.init();
+  }
+
   _handleMenuClick(menuItem) {
     console.log(menuItem);
-    this.init(menuItem);
+    if (this._menuModel.getMenuItem() === menuItem) {
+      return;
+    }
+
     switch (menuItem) {
       case MenuItem.TABLE:
-        // Показать доску
-        // Скрыть статистику
+        this._menuModel.setMenuItem(UpdateType.REMOVE_STATS, menuItem);
         break;
       case MenuItem.STATS:
-        // Скрыть доску
-        // Показать статистику
+        this._menuModel.setMenuItem(UpdateType.REMOVE_TABLE, menuItem);
         break;
     }
   }
