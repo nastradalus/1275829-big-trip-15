@@ -6,7 +6,7 @@ import SmartView from './smart';
 import flatpickr from 'flatpickr';
 
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
-import he from "he";
+import he from 'he';
 
 const DATEPICKER_24HOURS_PARAMETER = 'time_24hr';
 const MIN_PRICE = 0;

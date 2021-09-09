@@ -35,7 +35,6 @@ export default class Menu {
   }
 
   _handleMenuClick(menuItem) {
-    console.log(menuItem);
     if (this._menuModel.getMenuItem() === menuItem) {
       return;
     }

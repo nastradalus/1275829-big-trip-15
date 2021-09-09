@@ -1,7 +1,7 @@
 import FilterView from '../view/filter.js';
 import {render, RenderPosition, replace, remove} from '../utils/render.js';
 import {FilterType, UpdateType} from '../const.js';
-import {isFuturePoint} from "../utils/common";
+import {isFuturePoint} from '../utils/common';
 
 const FilterName = {
   [FilterType.EVERYTHING]: 'Everything',
