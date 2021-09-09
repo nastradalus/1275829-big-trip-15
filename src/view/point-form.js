@@ -6,6 +6,7 @@ import SmartView from './smart';
 import flatpickr from 'flatpickr';
 
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
+import he from 'he';
 
 const DATEPICKER_24HOURS_PARAMETER = 'time_24hr';
 const MIN_PRICE = 0;
@@ -68,11 +69,16 @@ const createDescriptionTemplate = (destination) => {
 
 const checkDestination = (destination) => DESTINATIONS.includes(destination);
 
-const correctPrice = (price) => price.replace(/^[0]*/, '');
+const correctPrice = (price) => +price.replace(/^[0]*/, '');
 
-const createPointFormTemplate = (data) => {
+const createPointFormTemplate = (data, isNewForm) => {
   const {type, destination, dateStart, dateEnd, price, offers} = data;
-  const isSubmitDisabled = (!checkDestination(destination) || !dateStart || !dateEnd);
+  const isSubmitDisabled = (!checkDestination(destination) || !dateStart || !dateEnd || !price);
+  const arrowTemplate = (!isNewForm)
+    ? `<button class="event__rollup-btn" type="button">
+         <span class="visually-hidden">Open event</span>
+       </button>`
+    : '';
 
   return `<li class="trip-events__item">
     <form class="event event--edit" action="#" method="post">
@@ -96,7 +102,7 @@ const createPointFormTemplate = (data) => {
           <label class="event__label  event__type-output" for="event-destination-1">
             ${type}
           </label>
-          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination}" list="destination-list-1">
+          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(destination)}" list="destination-list-1">
           <datalist id="destination-list-1">
             ${createDestinationTemplate()}
           </datalist>
@@ -115,14 +121,12 @@ const createPointFormTemplate = (data) => {
             <span class="visually-hidden">Price</span>
             €
           </label>
-          <input class="event__input  event__input--price" id="event-price-1" type="number" min="0" name="event-price" value="${price}">
+          <input class="event__input  event__input--price" id="event-price-1" type="number" min="0" name="event-price" value="${he.encode(price.toString())}">
         </div>
 
         <button class="event__save-btn  btn  btn--blue" type="submit" ${isSubmitDisabled ? 'disabled' : ''}>Save</button>
         <button class="event__reset-btn" type="reset">Delete</button>
-        <button class="event__rollup-btn" type="button">
-          <span class="visually-hidden">Open event</span>
-        </button>
+        ${arrowTemplate}
       </header>
       <section class="event__details">
         ${createOffersTemplate(offers, type)}
@@ -134,12 +138,13 @@ const createPointFormTemplate = (data) => {
 };
 
 export default class PointForm extends SmartView {
-  constructor(point = BLANK_POINT) {
+  constructor(point = BLANK_POINT, isNewForm = false) {
     super();
 
     this._data = PointForm.parsePointToData(point);
     this._startDatepicker = null;
     this._endDatepicker = null;
+    this._isNewForm = isNewForm;
 
     this._clickHandler = this._clickHandler.bind(this);
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
@@ -151,6 +156,7 @@ export default class PointForm extends SmartView {
     this._dateEndChangeHandler = this._dateEndChangeHandler.bind(this);
     this._offersChangeHandler = this._offersChangeHandler.bind(this);
     this._destinationInputHandler = this._destinationInputHandler.bind(this);
+    this._formDeleteClickHandler = this._formDeleteClickHandler.bind(this);
 
     this._setInnerHandlers();
   }
@@ -293,18 +299,30 @@ export default class PointForm extends SmartView {
     }
   }
 
+  _formDeleteClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.deleteClick(PointForm.parseDataToPoint(this._data));
+  }
+
   getTemplate() {
-    return createPointFormTemplate(this._data);
+    return createPointFormTemplate(this._data, this._isNewForm);
   }
 
   setClickHandler(callback) {
     this._callback.click = callback;
-    this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._clickHandler);
+    if (!this._isNewForm) {
+      this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._clickHandler);
+    }
   }
 
-  setSubmitHandler(callback) {
+  setFormSubmitHandler(callback) {
     this._callback.submit = callback;
     this.getElement().querySelector('form').addEventListener('submit', this._formSubmitHandler);
+  }
+
+  setDeleteClickHandler(callback) {
+    this._callback.deleteClick = callback;
+    this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._formDeleteClickHandler);
   }
 
   reset(point) {
@@ -316,7 +334,22 @@ export default class PointForm extends SmartView {
   restoreHandlers() {
     this._setInnerHandlers();
     this.setClickHandler(this._callback.click);
-    this.setSubmitHandler(this._callback.submit);
+    this.setFormSubmitHandler(this._callback.submit);
+    this.setDeleteClickHandler(this._callback.deleteClick);
+  }
+
+  removeElement() {
+    super.removeElement();
+
+    if (this._startDatepicker) {
+      this._startDatepicker.destroy();
+      this._startDatepicker = null;
+    }
+
+    if (this._endDatepicker) {
+      this._endDatepicker.destroy();
+      this._endDatepicker = null;
+    }
   }
 
   static parsePointToData(point) {

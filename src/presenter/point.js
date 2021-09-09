@@ -1,6 +1,7 @@
 import PointView from '../view/point';
 import PointFormView from '../view/point-form';
 import {remove, render, RenderPosition, replace} from '../utils/render';
+import {UserAction, UpdateType} from '../const.js';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -21,6 +22,7 @@ export default class Point {
     this._handleEditClick = this._handleEditClick.bind(this);
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
+    this._handleDeleteClick = this._handleDeleteClick.bind(this);
   }
 
   init(point) {
@@ -34,8 +36,9 @@ export default class Point {
 
     this._pointComponent.setClickHandler(this._handleEditClick);
     this._pointComponent.setFavoriteClickHandler(this._handleFavoriteClick);
-    this._pointFormComponent.setSubmitHandler(this._handleFormSubmit);
+    this._pointFormComponent.setFormSubmitHandler(this._handleFormSubmit);
     this._pointFormComponent.setClickHandler(this._handleFormSubmit);
+    this._pointFormComponent.setDeleteClickHandler(this._handleDeleteClick);
 
     if (prevPointComponent === null || prevPointFormComponent === null) {
       render(this._pointListComponent, this._pointComponent, RenderPosition.BEFORE_END);
@@ -90,13 +93,24 @@ export default class Point {
     this._replacePointToForm();
   }
 
-  _handleFormSubmit(point) {
-    this._changeData(point);
+  _handleFormSubmit(update) {
+    const isMajorUpdate = (update.dateStart !== this._point.dateStart)
+      || (update.dateEnd !== this._point.dateEnd)
+      || (update.price !== this._point.price)
+      || (update.destination !== this._point.destination);
+
+    this._changeData(
+      UserAction.UPDATE_POINT,
+      isMajorUpdate ? UpdateType.ALL : UpdateType.POINT,
+      update,
+    );
     this._replaceFormToPoint();
   }
 
   _handleFavoriteClick() {
     this._changeData(
+      UserAction.UPDATE_POINT,
+      UpdateType.POINT,
       Object.assign(
         {},
         this._point,
@@ -104,6 +118,14 @@ export default class Point {
           isFavorite: !this._point.isFavorite,
         },
       ),
+    );
+  }
+
+  _handleDeleteClick(point) {
+    this._changeData(
+      UserAction.DELETE_POINT,
+      UpdateType.ALL,
+      point,
     );
   }
 }

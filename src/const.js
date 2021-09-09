@@ -55,3 +55,35 @@ export const SortType = {
   BY_TIME: 'sort-time',
   BY_PRICE: 'sort-price',
 };
+
+export const UserAction = {
+  UPDATE_POINT: 'UPDATE_POINT',
+  ADD_POINT: 'ADD_POINT',
+  DELETE_POINT: 'DELETE_POINT',
+};
+
+export const UpdateType = {
+  POINT: 'POINT',
+  LIST: 'LIST',
+  ALL: 'ALL',
+  REMOVE_STATS: 'REMOVE_STATS',
+  REMOVE_TABLE: 'REMOVE_TABLE',
+  NEW_EVENT: 'NEW_EVENT',
+};
+
+export const FilterType = {
+  EVERYTHING: 'everything',
+  FUTURE: 'future',
+  PAST: 'past',
+};
+
+export const MenuItem = {
+  TABLE: 'TABLE',
+  STATS: 'STATS',
+};
+
+export const StatisticType = {
+  MONEY: 'MONEY',
+  TYPE: 'TYPE',
+  TIME: 'TIME',
+};
