@@ -2,18 +2,17 @@ import he from 'he';
 import {formatDate, getTimeDuration} from '../utils/common';
 import {DateFormat} from '../const';
 import AbstractView from './abstract';
-import {OFFERS_BY_TYPE} from '../mock/offer';
 
 const FAVORITE_CLASS = 'event__favorite-btn--active';
 
-const createOffersTemplate = (offers, type) => {
-  const fullOffers = OFFERS_BY_TYPE[type].filter(({code}) => offers.includes(code));
+const createOffersTemplate = (offers, type, allOffers) => {
+  const fullOffers = allOffers[type].filter(({code}) => offers.includes(code));
 
   return fullOffers.length
     ? `<h4 class="visually-hidden">Offers:</h4>
       <ul class="event__selected-offers">
-        ${fullOffers.map(({description, price}) => `<li class="event__offer">
-           <span class="event__offer-title">${description}</span>
+        ${fullOffers.map(({title, price}) => `<li class="event__offer">
+           <span class="event__offer-title">${title}</span>
             +€&nbsp;
            <span class="event__offer-price">${price}</span>
          </li>`).join('')}
@@ -21,10 +20,10 @@ const createOffersTemplate = (offers, type) => {
     : '';
 };
 
-const createPointTemplate = (point) => {
+const createPointTemplate = (point, allOffers) => {
   const {dateStart, dateEnd, type, destination, price, offers, isFavorite} = point;
   const duration = getTimeDuration(dateStart, dateEnd);
-  const offersTemplate = createOffersTemplate(offers, type);
+  const offersTemplate = createOffersTemplate(offers, type, allOffers);
   const favoriteClassName = isFavorite ? FAVORITE_CLASS : '';
 
   return `<li class="trip-events__item">
@@ -60,16 +59,17 @@ const createPointTemplate = (point) => {
 };
 
 export default class Point extends AbstractView {
-  constructor(point) {
+  constructor(point, offers) {
     super();
     this._point = point;
+    this._offers = offers;
 
     this._clickHandler = this._clickHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
   }
 
   getTemplate() {
-    return createPointTemplate(this._point);
+    return createPointTemplate(this._point, this._offers);
   }
 
   _clickHandler(evt) {

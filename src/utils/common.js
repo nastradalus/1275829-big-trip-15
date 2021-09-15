@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 import {DateFormat, POINT_TYPE, StatisticType} from '../const';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 
 const HOURS_ROUND = 60;
 const DAYS_ROUND = 24;
@@ -84,6 +85,11 @@ export const sortPointByTime = (point1, point2) => {
   const pointDuration2 = dayjs(point2.dateEnd).diff(dayjs(point2.dateStart));
 
   return pointDuration2 - pointDuration1;
+};
+
+export const getDateFromServerFormat = (date) => {
+  dayjs.extend(customParseFormat);
+  return dayjs(date, DateFormat.FULL_DATETIME);
 };
 
 export const sortPointByPrice = (point1, point2) => point2.price - point1.price;

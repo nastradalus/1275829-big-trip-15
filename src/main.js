@@ -4,13 +4,17 @@ import MenuPresenter from './presenter/menu';
 import PointsModel from './model/points';
 import FilterModel from './model/filter';
 import MenuModel from './model/menu';
-import {generatePoint} from './mock/point';
+import DestinationsModel from './model/destinations';
+import OffersModel from './model/offers';
+import Api from './api';
 
-const POINT_COUNT = 10;
-const points = new Array(POINT_COUNT).fill(null).map(() => generatePoint());
+const AUTHORIZATION = 'Basic 1275829-big-trip-15';
+const SERVER = 'https://15.ecmascript.pages.academy/big-trip';
 
+const destinationsModel = new DestinationsModel();
+const offersModel = new OffersModel();
 const pointsModel = new PointsModel();
-pointsModel.setPoints(points);
+const api = new Api(SERVER, AUTHORIZATION);
 
 const filterModel = new FilterModel();
 const menuModel = new MenuModel();
@@ -35,11 +39,44 @@ const filterPresenter = new FilterPresenter(filtersElement, filterModel, pointsM
 const tripPresenter = new TripPresenter(mainElement, tripEventsElement, pointsModel, filterModel, menuModel, statisticContainer, newEventButtonAction);
 const menuPresenter = new MenuPresenter(navigationElement, menuModel);
 
-menuPresenter.init();
-filterPresenter.init();
-tripPresenter.init();
-
+newEventButtonAction.disable();
 newEventButtonElement.addEventListener('click', (evt) => {
   evt.preventDefault();
   tripPresenter.createPoint();
 });
+
+Promise.all([
+  api.getDestinations(),
+  api.getOffers(),
+  api.getPoints(),
+])
+  .then(([destinations, offers, points]) => {
+    destinationsModel.destinations = destinations;
+    offersModel.offers = offers;
+
+    pointsModel.setDestinations(destinationsModel.destinations);
+    pointsModel.setOffers(offersModel.offers);
+    pointsModel.setPoints(points.map((point) => pointsModel.adaptToClient(point)));
+
+    menuPresenter.init();
+    filterPresenter.init();
+    tripPresenter.init();
+    newEventButtonAction.enable();
+  });
+
+/*api.getDestinations().then((descriptions) => {
+  pointsModel.setDestinations(descriptions);
+
+  api.getOffers().then((offers) => {
+    pointsModel.setOffers(offers);
+
+    api.getPoints().then((points) => {
+      pointsModel.setPoints(points.map((point) => pointsModel.adaptToClient(point)));
+
+      menuPresenter.init();
+      filterPresenter.init();
+      tripPresenter.init();
+      newEventButtonAction.enable();
+    });
+  });
+});*/

@@ -1,9 +1,28 @@
 import AbstractObserver from '../utils/abstract-observer.js';
+import {getDateFromServerFormat} from "../utils/common";
 
-export default class Tasks extends AbstractObserver {
+export default class Points extends AbstractObserver {
   constructor() {
     super();
     this._points = [];
+    this._destinations = {};
+    this._offers = {};
+  }
+
+  setDestinations(destinations) {
+    this._destinations = destinations;
+  }
+
+  setOffers(offers) {
+    this._offers = offers;
+  }
+
+  getDestinations() {
+    return this._destinations;
+  }
+
+  getOffers() {
+    return this._offers;
   }
 
   setPoints(points) {
@@ -52,5 +71,58 @@ export default class Tasks extends AbstractObserver {
     ];
 
     this._notify(updateType);
+  }
+
+  adaptToClient(point) {
+    const allPointOffers = this._offers[point.type];
+    const pointOffers = [];
+
+    point['offers'].forEach((offer) => {
+      pointOffers.push(
+        allPointOffers.find(({title}) => title === offer.title).code,
+      );
+    });
+
+    const adaptedPoint = Object.assign(
+      {},
+      point,
+      {
+        price: point['base_price'],
+        destination: point['destination'].name,
+        dateStart: getDateFromServerFormat(point['date_from']),
+        dateEnd: getDateFromServerFormat(point['date_to']),
+        isFavorite: point['is_favorite'],
+        offers: pointOffers,
+      },
+    );
+
+    delete adaptedPoint['base_price'];
+    delete adaptedPoint['date_from'];
+    delete adaptedPoint['date_to'];
+    delete adaptedPoint['is_favorite'];
+
+    return adaptedPoint;
+  }
+
+  adaptToServer(point) {
+    const adaptedPoint = Object.assign(
+      {},
+      point,
+      {
+        'base_price': point.price,
+        'destination': point.price,
+        'date_from': point.price,
+        'date_to': point.price,
+        'is_favorite': point.price,
+        'offers': point.price,
+      },
+    );
+
+    delete adaptedPoint.price;
+    delete adaptedPoint.dateStart;
+    delete adaptedPoint.dateEnd;
+    delete adaptedPoint.isFavorite;
+
+    return adaptedPoint;
   }
 }

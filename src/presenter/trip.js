@@ -107,7 +107,13 @@ export default class Trip {
 
   _renderTrip({onlyListUpdate = false} = {}) {
     this._renderList();
-    this._pointNewPresenter = new PointNewPresenter(this._pointListComponent, this._handleViewAction, this._newEventButton);
+    this._pointNewPresenter = new PointNewPresenter(
+      this._pointListComponent,
+      this._handleViewAction,
+      this._newEventButton,
+      this._pointsModel.getDestinations(),
+      this._pointsModel.getOffers(),
+    );
 
     if (!this._getPoints().length) {
       this._renderNoPoints();
@@ -136,14 +142,14 @@ export default class Trip {
 
   _renderPoint(point) {
     const pointPresenter = new PointPresenter(this._pointListComponent, this._handleViewAction, this._handleModeChange);
-    pointPresenter.init(point);
+    pointPresenter.init(point, this._pointsModel.getDestinations(), this._pointsModel.getOffers());
     this._pointPresenter.set(point.id, pointPresenter);
   }
 
   _renderTripInfo() {
     const points = this._getPoints(false);
     const routeComponent = new RouteView(points);
-    const costComponent = new CostView(points);
+    const costComponent = new CostView(points, this._pointsModel.getOffers());
 
     render(this._tripInfoComponent, routeComponent, RenderPosition.BEFORE_END);
     render(this._tripInfoComponent, costComponent, RenderPosition.BEFORE_END);

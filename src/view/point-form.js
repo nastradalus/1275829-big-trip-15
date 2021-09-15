@@ -1,7 +1,5 @@
-import {POINT_TYPE, DESTINATIONS, DateFormat} from '../const';
-import {DESTINATIONS_INFO} from '../mock/destination';
+import {POINT_TYPE, DateFormat} from '../const';
 import {formatDate} from '../utils/common';
-import {OFFERS_BY_TYPE} from '../mock/offer';
 import SmartView from './smart';
 import flatpickr from 'flatpickr';
 
@@ -13,7 +11,7 @@ const MIN_PRICE = 0;
 
 const BLANK_POINT = {
   type: POINT_TYPE[0],
-  destination: DESTINATIONS[0],
+  destination: '',
   dateStart: null,
   dateEnd: null,
   price: '',
@@ -26,22 +24,22 @@ const createTypeTemplate = () =>
     <label class="event__type-label  event__type-label--${point.toLowerCase()}" for="event-type-${point.toLowerCase()}-1">${point}</label>
   </div>`).join('');
 
-const createDestinationTemplate = () =>
-  DESTINATIONS.map((destination) => `<option value="${destination}"></option>`).join('');
+const createDestinationTemplate = (allDestinations) =>
+  Object.keys(allDestinations).map((destination) => `<option value="${destination}"></option>`).join('');
 
-const createOffersTemplate = (currentOffers, type) => {
-  const typeOffers = OFFERS_BY_TYPE[type] ? OFFERS_BY_TYPE[type] : [];
+const createOffersTemplate = (currentOffers, type, allOffers) => {
+  const typeOffers = allOffers[type] ? allOffers[type] : [];
 
   return typeOffers.length
     ? `<section class="event__section  event__section--offers">
       <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
-      ${typeOffers.map(({code, description, price}) => `<div class="event__available-offers">
+      ${typeOffers.map(({code, title, price}) => `<div class="event__available-offers">
         <div class="event__offer-selector">
           <input class="event__offer-checkbox visually-hidden" id="event-offer-${code}-1" data-value="${code}"
                  type="checkbox" name="event-offer-${code}" ${currentOffers.includes(code) ? 'checked' : ''}>
           <label class="event__offer-label" for="event-offer-${code}-1">
-            <span class="event__offer-title">${description}</span>
+            <span class="event__offer-title">${title}</span>
             +€&nbsp;
             <span class="event__offer-price">${price}</span>
           </label>
@@ -50,8 +48,8 @@ const createOffersTemplate = (currentOffers, type) => {
     : '';
 };
 
-const createDescriptionTemplate = (destination) => {
-  const destinationInfo = DESTINATIONS_INFO[destination];
+const createDescriptionTemplate = (destination, allDestinations) => {
+  const destinationInfo = allDestinations[destination];
 
   return destinationInfo
     ? `<section class="event__section  event__section--destination">
@@ -67,13 +65,13 @@ const createDescriptionTemplate = (destination) => {
     : '';
 };
 
-const checkDestination = (destination) => DESTINATIONS.includes(destination);
+const checkDestination = (destination, allDestinations) => Object.keys(allDestinations).includes(destination);
 
 const correctPrice = (price) => +price.replace(/^[0]*/, '');
 
-const createPointFormTemplate = (data, isNewForm) => {
+const createPointFormTemplate = (data, allDestinations, allOffers, isNewForm) => {
   const {type, destination, dateStart, dateEnd, price, offers} = data;
-  const isSubmitDisabled = (!checkDestination(destination) || !dateStart || !dateEnd || !price);
+  const isSubmitDisabled = (!checkDestination(destination, allDestinations) || !dateStart || !dateEnd || !price);
   const arrowTemplate = (!isNewForm)
     ? `<button class="event__rollup-btn" type="button">
          <span class="visually-hidden">Open event</span>
@@ -104,7 +102,7 @@ const createPointFormTemplate = (data, isNewForm) => {
           </label>
           <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(destination)}" list="destination-list-1">
           <datalist id="destination-list-1">
-            ${createDestinationTemplate()}
+            ${createDestinationTemplate(allDestinations)}
           </datalist>
         </div>
 
@@ -129,19 +127,21 @@ const createPointFormTemplate = (data, isNewForm) => {
         ${arrowTemplate}
       </header>
       <section class="event__details">
-        ${createOffersTemplate(offers, type)}
+        ${createOffersTemplate(offers, type, allOffers)}
 
-        ${createDescriptionTemplate(destination)}
+        ${createDescriptionTemplate(destination, allDestinations)}
       </section>
     </form>
   </li>`;
 };
 
 export default class PointForm extends SmartView {
-  constructor(point = BLANK_POINT, isNewForm = false) {
+  constructor(point = BLANK_POINT, destinations, offers, isNewForm = false) {
     super();
 
     this._data = PointForm.parsePointToData(point);
+    this._destinations = destinations;
+    this._offers = offers;
     this._startDatepicker = null;
     this._endDatepicker = null;
     this._isNewForm = isNewForm;
@@ -305,7 +305,7 @@ export default class PointForm extends SmartView {
   }
 
   getTemplate() {
-    return createPointFormTemplate(this._data, this._isNewForm);
+    return createPointFormTemplate(this._data, this._destinations, this._offers, this._isNewForm);
   }
 
   setClickHandler(callback) {
