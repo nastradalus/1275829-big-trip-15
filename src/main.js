@@ -7,6 +7,7 @@ import MenuModel from './model/menu';
 import DestinationsModel from './model/destinations';
 import OffersModel from './model/offers';
 import Api from './api';
+import {UpdateType} from './const';
 
 const AUTHORIZATION = 'Basic 1275829-big-trip-15';
 const SERVER = 'https://15.ecmascript.pages.academy/big-trip';
@@ -35,15 +36,20 @@ const newEventButtonAction = {
   },
 };
 
-const filterPresenter = new FilterPresenter(filtersElement, filterModel, pointsModel);
-const tripPresenter = new TripPresenter(mainElement, tripEventsElement, pointsModel, filterModel, menuModel, statisticContainer, newEventButtonAction);
-const menuPresenter = new MenuPresenter(navigationElement, menuModel);
-
 newEventButtonAction.disable();
+
+const menuPresenter = new MenuPresenter(navigationElement, menuModel);
+const filterPresenter = new FilterPresenter(filtersElement, filterModel, pointsModel);
+const tripPresenter = new TripPresenter(mainElement, tripEventsElement, pointsModel, filterModel, menuModel, statisticContainer, newEventButtonAction, api);
+
 newEventButtonElement.addEventListener('click', (evt) => {
   evt.preventDefault();
   tripPresenter.createPoint();
 });
+
+menuPresenter.init();
+filterPresenter.init();
+tripPresenter.init();
 
 Promise.all([
   api.getDestinations(),
@@ -54,29 +60,7 @@ Promise.all([
     destinationsModel.destinations = destinations;
     offersModel.offers = offers;
 
-    pointsModel.setDestinations(destinationsModel.destinations);
-    pointsModel.setOffers(offersModel.offers);
-    pointsModel.setPoints(points.map((point) => pointsModel.adaptToClient(point)));
-
-    menuPresenter.init();
-    filterPresenter.init();
-    tripPresenter.init();
-    newEventButtonAction.enable();
+    pointsModel.setDestinations(destinationsModel);
+    pointsModel.setOffers(offersModel);
+    pointsModel.setPoints(UpdateType.INIT, points.map((point) => pointsModel.adaptToClient(point)));
   });
-
-/*api.getDestinations().then((descriptions) => {
-  pointsModel.setDestinations(descriptions);
-
-  api.getOffers().then((offers) => {
-    pointsModel.setOffers(offers);
-
-    api.getPoints().then((points) => {
-      pointsModel.setPoints(points.map((point) => pointsModel.adaptToClient(point)));
-
-      menuPresenter.init();
-      filterPresenter.init();
-      tripPresenter.init();
-      newEventButtonAction.enable();
-    });
-  });
-});*/

@@ -1,8 +1,8 @@
 const Method = {
-  GET: 'GET', // получить точки
-  PUT: 'PUT', // редактирование точки
-  POST: 'POST', // создание точки
-  DELETE: 'DELETE', // удаление точки
+  GET: 'GET',
+  PUT: 'PUT',
+  POST: 'POST',
+  DELETE: 'DELETE',
 };
 
 export default class Api {
@@ -34,6 +34,23 @@ export default class Api {
       headers: new Headers({'Content-Type': 'application/json'}),
     })
       .then(Api.fromJSON);
+  }
+
+  addPoint(point) {
+    return this._load({
+      url: 'points',
+      method: Method.POST,
+      body: JSON.stringify(point),
+      headers: new Headers({'Content-Type': 'application/json'}),
+    })
+      .then(Api.fromJSON);
+  }
+
+  deletePoint(point) {
+    return this._load({
+      url: `points/${point.id}`,
+      method: Method.DELETE,
+    });
   }
 
   _load({url, method = Method.GET, body = null, headers = new Headers()}) {

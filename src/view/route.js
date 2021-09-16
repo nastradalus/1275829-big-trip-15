@@ -1,4 +1,4 @@
-import {getRoutePeriod} from '../utils/common';
+import {formatDateToDateObject, getRoutePeriod} from '../utils/common';
 import AbstractView from './abstract';
 
 const MAX_POINT_COUNT_IN_ROUTE = 3;
@@ -10,8 +10,8 @@ const createRouteTemplate = (points = []) => {
   let lastPoint = '';
 
   points.forEach((point) => {
-    startDates.push(point.dateStart);
-    endDates.push(point.dateEnd);
+    startDates.push(formatDateToDateObject(point.dateStart));
+    endDates.push(formatDateToDateObject(point.dateEnd));
 
     if (point.destination !== lastPoint) {
       routePoints.push(point.destination);

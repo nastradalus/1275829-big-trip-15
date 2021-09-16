@@ -64,7 +64,7 @@ export default class Point extends AbstractView {
     this._point = point;
     this._offers = offers;
 
-    this._clickHandler = this._clickHandler.bind(this);
+    this._clickRowHandler = this._clickRowHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
   }
 
@@ -72,14 +72,14 @@ export default class Point extends AbstractView {
     return createPointTemplate(this._point, this._offers);
   }
 
-  _clickHandler(evt) {
+  _clickRowHandler(evt) {
     evt.preventDefault();
     this._callback.click();
   }
 
-  setClickHandler(callback) {
+  setRowClickHandler(callback) {
     this._callback.click = callback;
-    this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._clickHandler);
+    this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._clickRowHandler);
   }
 
   _favoriteClickHandler(evt) {

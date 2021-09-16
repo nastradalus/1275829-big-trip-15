@@ -1,4 +1,4 @@
-export const POINT_TYPE = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing'];
+export const POINT_TYPE = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
 
 export const DateFormat = {
   ONLY_DATE: 'YYYY-MM-DD',
@@ -8,7 +8,7 @@ export const DateFormat = {
   FLATPICKR: 'd/m/y H:i',
   SHORT: 'MMM D',
   DATETIME: 'YYYY-MM-DDTHH:mm',
-  FULL_DATETIME: 'YYYY-MM-DDTHH:mm:ss.SSSZ',
+  SERVER_DATE: 'YYYY-MM-DDTHH:mm:ss.SSSZ',
 };
 
 export const SortType = {
@@ -30,6 +30,7 @@ export const UpdateType = {
   REMOVE_STATS: 'REMOVE_STATS',
   REMOVE_TABLE: 'REMOVE_TABLE',
   NEW_EVENT: 'NEW_EVENT',
+  INIT: 'INIT',
 };
 
 export const FilterType = {

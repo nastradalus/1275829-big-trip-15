@@ -1,32 +1,34 @@
 import AbstractObserver from '../utils/abstract-observer.js';
-import {getDateFromServerFormat} from "../utils/common";
+import {formatDateToISO} from '../utils/common';
 
 export default class Points extends AbstractObserver {
   constructor() {
     super();
     this._points = [];
-    this._destinations = {};
-    this._offers = {};
+    this._destinationsModel = null;
+    this._offersModel = null;
   }
 
   setDestinations(destinations) {
-    this._destinations = destinations;
+    this._destinationsModel = destinations;
   }
 
   setOffers(offers) {
-    this._offers = offers;
+    this._offersModel = offers;
   }
 
   getDestinations() {
-    return this._destinations;
+    return this._destinationsModel.destinations;
   }
 
   getOffers() {
-    return this._offers;
+    return this._offersModel.offers;
   }
 
-  setPoints(points) {
+  setPoints(updateType, points) {
     this._points = points.slice();
+
+    this._notify(updateType);
   }
 
   getPoints() {
@@ -59,7 +61,7 @@ export default class Points extends AbstractObserver {
   }
 
   deletePoint(updateType, update) {
-    const index = this._points.findIndex((task) => task.id === update.id);
+    const index = this._points.findIndex((point) => point.id === update.id);
 
     if (index === -1) {
       throw new Error('Can\'t delete unexisting point');
@@ -74,7 +76,7 @@ export default class Points extends AbstractObserver {
   }
 
   adaptToClient(point) {
-    const allPointOffers = this._offers[point.type];
+    const allPointOffers = this.getOffers()[point.type];
     const pointOffers = [];
 
     point['offers'].forEach((offer) => {
@@ -89,8 +91,8 @@ export default class Points extends AbstractObserver {
       {
         price: point['base_price'],
         destination: point['destination'].name,
-        dateStart: getDateFromServerFormat(point['date_from']),
-        dateEnd: getDateFromServerFormat(point['date_to']),
+        dateStart: formatDateToISO(point['date_from']),
+        dateEnd: formatDateToISO(point['date_to']),
         isFavorite: point['is_favorite'],
         offers: pointOffers,
       },
@@ -105,16 +107,25 @@ export default class Points extends AbstractObserver {
   }
 
   adaptToServer(point) {
+    const allPointOffers = this.getOffers()[point.type];
+    const pointOffers = [];
+
+    allPointOffers.forEach(({code, title, price}) => {
+      if (point.offers.includes(code)) {
+        pointOffers.push({title, price});
+      }
+    });
+
     const adaptedPoint = Object.assign(
       {},
       point,
       {
         'base_price': point.price,
-        'destination': point.price,
-        'date_from': point.price,
-        'date_to': point.price,
-        'is_favorite': point.price,
-        'offers': point.price,
+        'destination': Object.assign({}, this.getDestinations()[point.destination], {name: point.destination}),
+        'date_from': formatDateToISO(point.dateStart),
+        'date_to': formatDateToISO(point.dateEnd),
+        'is_favorite': point.isFavorite,
+        'offers': pointOffers,
       },
     );
 

@@ -1,5 +1,5 @@
 import {POINT_TYPE, DateFormat} from '../const';
-import {formatDate} from '../utils/common';
+import {formatDate, formatDateToISO} from '../utils/common';
 import SmartView from './smart';
 import flatpickr from 'flatpickr';
 
@@ -16,6 +16,7 @@ const BLANK_POINT = {
   dateEnd: null,
   price: '',
   offers: [],
+  isFavorite: false,
 };
 
 const createTypeTemplate = () =>
@@ -36,9 +37,9 @@ const createOffersTemplate = (currentOffers, type, allOffers) => {
 
       ${typeOffers.map(({code, title, price}) => `<div class="event__available-offers">
         <div class="event__offer-selector">
-          <input class="event__offer-checkbox visually-hidden" id="event-offer-${code}-1" data-value="${code}"
+          <input class="event__offer-checkbox visually-hidden" id="event-offer-${code}" data-value="${code}"
                  type="checkbox" name="event-offer-${code}" ${currentOffers.includes(code) ? 'checked' : ''}>
-          <label class="event__offer-label" for="event-offer-${code}-1">
+          <label class="event__offer-label" for="event-offer-${code}">
             <span class="event__offer-title">${title}</span>
             +€&nbsp;
             <span class="event__offer-price">${price}</span>
@@ -55,9 +56,9 @@ const createDescriptionTemplate = (destination, allDestinations) => {
     ? `<section class="event__section  event__section--destination">
           <h3 class="event__section-title  event__section-title--destination">Destination</h3>
           <p class="event__destination-description">${destinationInfo.description}</p>
-          ${destinationInfo.photos ? `<div class="event__photos-container">
+          ${destinationInfo.pictures ? `<div class="event__photos-container">
             <div class="event__photos-tape">
-              ${destinationInfo.photos.map((photo) => `<img class="event__photo" src="${photo}" alt="Event photo">`).join('')}
+              ${destinationInfo.pictures.map((picture) => `<img class="event__photo" src="${picture.src}" alt="${picture.description}">`).join('')}
             </div>
           </div>` : ''}
         </section>
@@ -71,7 +72,7 @@ const correctPrice = (price) => +price.replace(/^[0]*/, '');
 
 const createPointFormTemplate = (data, allDestinations, allOffers, isNewForm) => {
   const {type, destination, dateStart, dateEnd, price, offers} = data;
-  const isSubmitDisabled = (!checkDestination(destination, allDestinations) || !dateStart || !dateEnd || !price);
+  const isSubmitDisabled = (!checkDestination(destination, allDestinations) || !dateStart || !dateEnd || !price || data.isDisabled);
   const arrowTemplate = (!isNewForm)
     ? `<button class="event__rollup-btn" type="button">
          <span class="visually-hidden">Open event</span>
@@ -82,11 +83,11 @@ const createPointFormTemplate = (data, allDestinations, allOffers, isNewForm) =>
     <form class="event event--edit" action="#" method="post">
       <header class="event__header">
         <div class="event__type-wrapper">
-          <label class="event__type  event__type-btn" for="event-type-toggle-1">
+          <label class="event__type event__type-btn" for="event-type-toggle-1">
             <span class="visually-hidden">Choose event type</span>
             <img class="event__type-icon" width="17" height="17" src="img/icons/${type.toLowerCase()}.png" alt="Event type icon">
           </label>
-          <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
+          <input class="event__type-toggle visually-hidden" id="event-type-toggle-1" type="checkbox">
 
           <div class="event__type-list">
             <fieldset class="event__type-group">
@@ -96,7 +97,7 @@ const createPointFormTemplate = (data, allDestinations, allOffers, isNewForm) =>
           </div>
         </div>
 
-        <div class="event__field-group  event__field-group--destination">
+        <div class="event__field-group event__field-group--destination">
           <label class="event__label  event__type-output" for="event-destination-1">
             ${type}
           </label>
@@ -106,7 +107,7 @@ const createPointFormTemplate = (data, allDestinations, allOffers, isNewForm) =>
           </datalist>
         </div>
 
-        <div class="event__field-group  event__field-group--time">
+        <div class="event__field-group event__field-group--time">
           <label class="visually-hidden" for="event-start-time-1">From</label>
           <input class="event__input  event__input--time event__input--date-start" id="event-start-time-1" type="text" name="event-start-time" value="${dateStart ? formatDate(dateStart) : ''}">
           —
@@ -114,7 +115,7 @@ const createPointFormTemplate = (data, allDestinations, allOffers, isNewForm) =>
           <input class="event__input  event__input--time event__input--date-end" id="event-end-time-1" type="text" name="event-end-time" value="${dateEnd ? formatDate(dateEnd) : ''}">
         </div>
 
-        <div class="event__field-group  event__field-group--price">
+        <div class="event__field-group event__field-group--price">
           <label class="event__label" for="event-price-1">
             <span class="visually-hidden">Price</span>
             €
@@ -122,8 +123,8 @@ const createPointFormTemplate = (data, allDestinations, allOffers, isNewForm) =>
           <input class="event__input  event__input--price" id="event-price-1" type="number" min="0" name="event-price" value="${he.encode(price.toString())}">
         </div>
 
-        <button class="event__save-btn  btn  btn--blue" type="submit" ${isSubmitDisabled ? 'disabled' : ''}>Save</button>
-        <button class="event__reset-btn" type="reset">Delete</button>
+        <button class="event__save-btn btn btn--blue" type="submit" ${isSubmitDisabled ? 'disabled' : ''}>${data.isSaving ? 'Saving...' : 'Save'}</button>
+        <button class="event__reset-btn btn" type="reset" ${data.isDisabled ? 'disabled' : ''}>${data.isDeleting ? 'Deleting...' : 'Delete'}</button>
         ${arrowTemplate}
       </header>
       <section class="event__details">
@@ -146,7 +147,7 @@ export default class PointForm extends SmartView {
     this._endDatepicker = null;
     this._isNewForm = isNewForm;
 
-    this._clickHandler = this._clickHandler.bind(this);
+    this._rowClickHandler = this._rowClickHandler.bind(this);
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._priceChangeHandler = this._priceChangeHandler.bind(this);
     this._dateStartInputHandler = this._dateStartInputHandler.bind(this);
@@ -161,7 +162,7 @@ export default class PointForm extends SmartView {
     this._setInnerHandlers();
   }
 
-  _clickHandler(evt) {
+  _rowClickHandler(evt) {
     evt.preventDefault();
     this._callback.click(this._data);
   }
@@ -233,13 +234,13 @@ export default class PointForm extends SmartView {
 
   _dateStartChangeHandler([userDate]) {
     this.updateData({
-      dateStart: userDate,
+      dateStart: formatDateToISO(userDate),
     });
   }
 
   _dateEndChangeHandler([userDate]) {
     this.updateData({
-      dateEnd: userDate,
+      dateEnd: formatDateToISO(userDate),
     });
   }
 
@@ -274,9 +275,8 @@ export default class PointForm extends SmartView {
 
   _offersChangeHandler(evt) {
     evt.preventDefault();
-    const checkedCodes = [...this.getElement()
-      .querySelectorAll('.event__offer-checkbox:checked')]
-      .map((field) => field.dataset.value);
+    const checkedCodes = [...this.getElement().querySelectorAll('.event__offer-checkbox:checked')]
+      .map((field) => +field.dataset.value);
 
     this.updateData({
       offers: checkedCodes,
@@ -286,7 +286,7 @@ export default class PointForm extends SmartView {
   _destinationInputHandler(evt) {
     evt.preventDefault();
 
-    if (!checkDestination(evt.target.value)) {
+    if (!checkDestination(evt.target.value, this._destinations)) {
       evt.target.setCustomValidity('The destination value can only be a value from the list.');
       evt.target.reportValidity();
     } else {
@@ -308,10 +308,10 @@ export default class PointForm extends SmartView {
     return createPointFormTemplate(this._data, this._destinations, this._offers, this._isNewForm);
   }
 
-  setClickHandler(callback) {
+  setRowClickHandler(callback) {
     this._callback.click = callback;
     if (!this._isNewForm) {
-      this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._clickHandler);
+      this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._rowClickHandler);
     }
   }
 
@@ -333,7 +333,7 @@ export default class PointForm extends SmartView {
 
   restoreHandlers() {
     this._setInnerHandlers();
-    this.setClickHandler(this._callback.click);
+    this.setRowClickHandler(this._callback.click);
     this.setFormSubmitHandler(this._callback.submit);
     this.setDeleteClickHandler(this._callback.deleteClick);
   }
@@ -356,11 +356,20 @@ export default class PointForm extends SmartView {
     return Object.assign(
       {},
       point,
+      {
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      },
     );
   }
 
   static parseDataToPoint(data) {
     data = Object.assign({}, data);
+
+    delete data.isDisabled;
+    delete data.isSaving;
+    delete data.isDeleting;
 
     return data;
   }
