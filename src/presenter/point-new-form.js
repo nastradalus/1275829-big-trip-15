@@ -1,18 +1,20 @@
 import PointFormView from '../view/point-form.js';
-import {nanoid} from 'nanoid';
 import {remove, render, RenderPosition} from '../utils/render.js';
 import {UserAction, UpdateType} from '../const.js';
 
-export default class PointNew {
-  constructor(pointListContainer, changeData, newEventButton) {
+export default class PointNewForm {
+  constructor(pointListContainer, changeData, newEventButton, destinations, offers) {
     this._pointListContainer = pointListContainer;
     this._changeData = changeData;
     this._newEventButton = newEventButton;
+    this._destinations = destinations;
+    this._offers = offers;
 
     this._pointFormComponent = null;
 
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
     this._handleDeleteClick = this._handleDeleteClick.bind(this);
+    this._handleRowClick = this._handleRowClick.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
   }
 
@@ -22,8 +24,9 @@ export default class PointNew {
     }
 
     this._newEventButton.disable();
-    this._pointFormComponent = new PointFormView(undefined, true);
+    this._pointFormComponent = new PointFormView(undefined, this._destinations, this._offers, true);
     this._pointFormComponent.setFormSubmitHandler(this._handleFormSubmit);
+    this._pointFormComponent.setRowClickHandler(this._handleRowClick);
     this._pointFormComponent.setDeleteClickHandler(this._handleDeleteClick);
 
     render(this._pointListContainer, this._pointFormComponent, RenderPosition.AFTER_BEGIN);
@@ -42,14 +45,34 @@ export default class PointNew {
     document.removeEventListener('keydown', this._escKeyDownHandler);
   }
 
-  _handleFormSubmit(task) {
+  setSaving() {
+    this._pointFormComponent.updateData({
+      isDisabled: true,
+      isSaving: true,
+    });
+  }
+
+  setAborting() {
+    const resetFormState = () => {
+      this._pointFormComponent.updateData({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    this._pointFormComponent.shake(resetFormState);
+  }
+
+  _handleFormSubmit(point) {
     this._changeData(
       UserAction.ADD_POINT,
       UpdateType.ALL,
-      // Пока у нас нет сервера, который бы после сохранения
-      // выдывал честный id задачи, нам нужно позаботиться об этом самим
-      Object.assign({id: nanoid()}, task),
+      point,
     );
+  }
+
+  _handleRowClick() {
     this._newEventButton.enable();
     this.destroy();
   }

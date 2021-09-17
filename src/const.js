@@ -1,16 +1,4 @@
-export const POINT_TYPE = ['Taxi', 'Bus', 'Train', 'Ship', 'Drive', 'Flight', 'Check-in', 'Sightseeing'];
-export const DESTINATIONS = ['Amsterdam', 'Chamonix', 'Geneva'];
-export const DESCRIPTIONS = [
-  'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-  'Cras aliquet varius magna, non porta ligula feugiat eget.',
-  'Fusce tristique felis at fermentum pharetra.',
-  'Aliquam id orci ut lectus varius viverra. Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante.',
-  'Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum.',
-  'Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui.',
-  'Sed sed nisi sed augue convallis suscipit in sed felis.',
-  'Aliquam erat volutpat.',
-  'Nunc fermentum tortor ac porta dapibus. In rutrum ac purus sit amet tempus.',
-];
+export const POINT_TYPE = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
 
 export const DateFormat = {
   ONLY_DATE: 'YYYY-MM-DD',
@@ -20,35 +8,8 @@ export const DateFormat = {
   FLATPICKR: 'd/m/y H:i',
   SHORT: 'MMM D',
   DATETIME: 'YYYY-MM-DDTHH:mm',
+  SERVER_DATE: 'YYYY-MM-DDTHH:mm:ss.SSSZ',
 };
-
-export const OFFERS = [
-  {
-    code: 'luggage',
-    description: 'Add luggage',
-    price: 30,
-  },
-  {
-    code: 'comfort',
-    description: 'Switch to comfort class',
-    price: 100,
-  },
-  {
-    code: 'meal',
-    description: 'Add meal',
-    price: 15,
-  },
-  {
-    code: 'seats',
-    description: 'Choose seats',
-    price: 5,
-  },
-  {
-    code: 'train',
-    description: 'Travel by train',
-    price: 40,
-  },
-];
 
 export const SortType = {
   BY_DAY: 'sort-day',
@@ -69,6 +30,7 @@ export const UpdateType = {
   REMOVE_STATS: 'REMOVE_STATS',
   REMOVE_TABLE: 'REMOVE_TABLE',
   NEW_EVENT: 'NEW_EVENT',
+  INIT: 'INIT',
 };
 
 export const FilterType = {

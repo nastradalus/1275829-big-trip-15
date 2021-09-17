@@ -9,7 +9,6 @@ const FilterName = {
   [FilterType.PAST]: 'Past',
 };
 
-//@todo добавить отключение фильтра, если элементов в фильтре нет
 export default class Filter {
   constructor(filterContainer, filterModel, pointsModel) {
     this._filterContainer = filterContainer;
@@ -63,12 +62,12 @@ export default class Filter {
       {
         type: FilterType.FUTURE,
         name: FilterName[FilterType.FUTURE],
-        isAvailable: points.filter((point) => isFuturePoint(point.dateStart)).length,
+        isAvailable: points.filter(({dateStart}) => isFuturePoint(dateStart)).length,
       },
       {
         type: FilterType.PAST,
         name: FilterName[FilterType.PAST],
-        isAvailable: points.filter((point) => !isFuturePoint(point.dateStart)).length,
+        isAvailable: points.filter(({dateEnd}) => !isFuturePoint(dateEnd)).length,
       },
     ];
   }

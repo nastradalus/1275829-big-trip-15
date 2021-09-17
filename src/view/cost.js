@@ -1,14 +1,13 @@
 import AbstractView from './abstract';
-import {OFFERS_BY_TYPE} from '../mock/offer';
 
-const getOfferPrices = ({type, offers}) => {
+const getOfferPrices = ({type, offers}, allOffers) => {
   let offerPrice = 0;
 
   if (!offers.length) {
     return offerPrice;
   }
 
-  OFFERS_BY_TYPE[type].forEach(({code, price}) => {
+  allOffers[type].forEach(({code, price}) => {
     if (offers.includes(code)) {
       offerPrice += price;
     }
@@ -17,11 +16,11 @@ const getOfferPrices = ({type, offers}) => {
   return offerPrice;
 };
 
-const createCostTemplate = (points = []) => {
+const createCostTemplate = (points = [], allOffers) => {
   let price = 0;
 
   points.forEach((point) => {
-    price += point.price + getOfferPrices(point);
+    price += point.price + getOfferPrices(point, allOffers);
   });
 
   return `<p class="trip-info__cost">
@@ -30,12 +29,13 @@ const createCostTemplate = (points = []) => {
 };
 
 export default class Cost extends AbstractView {
-  constructor(points) {
+  constructor(points, offers) {
     super();
     this._points = points;
+    this._offers = offers;
   }
 
   getTemplate() {
-    return createCostTemplate(this._points);
+    return createCostTemplate(this._points, this._offers);
   }
 }

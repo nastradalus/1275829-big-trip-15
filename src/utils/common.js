@@ -8,39 +8,6 @@ const NUMBER_LIMIT_WITHOUT_ZERO = 10;
 const TYPE_COUNT_INCREMENT = 1;
 const MAP_VALUE_INDEX = 1;
 
-export const getRandomInteger = (a = 0, b = 1) => {
-  const lower = Math.ceil(Math.min(a, b));
-  const upper = Math.floor(Math.max(a, b));
-
-  return Math.floor(lower + Math.random() * (upper - lower + 1));
-};
-
-export const getRandomArrayElement = (array) => array[getRandomInteger(0, array.length - 1)];
-
-export const getRandomArrayElements = (array, maxCount = array.length - 1, minCount = 0) => {
-  const count = getRandomInteger(Math.min(minCount, array.length - 1), Math.min(maxCount, array.length - 1));
-  const shuffledArray = array.sort(() => 0.5 - Math.random());
-
-  return shuffledArray.slice(0, count);
-};
-
-export const generateDatePeriod = () => {
-  const maxDaysGap = 7;
-  const daysGap = getRandomInteger(-maxDaysGap, maxDaysGap);
-  const maxTimeGap = 3 * 60;
-  const timeGap = getRandomInteger(-maxTimeGap, maxTimeGap);
-  const maxNextDateTimeGap = 1.5 * 60;
-  const nextDateTimeGap = getRandomInteger(30, maxNextDateTimeGap);
-
-  const dateStart = dayjs().add(daysGap, 'day').add(timeGap, 'minute').toDate();
-  const dateEnd = dayjs(dateStart).add(nextDateTimeGap, 'minute').toDate();
-
-  return {
-    dateStart,
-    dateEnd,
-  };
-};
-
 export const formatDate = (date, format = DateFormat.FULL) => dayjs(date).format(format);
 
 export const fillByZero = (number) => (number < NUMBER_LIMIT_WITHOUT_ZERO ? `0${number}` : number);
@@ -86,9 +53,13 @@ export const sortPointByTime = (point1, point2) => {
   return pointDuration2 - pointDuration1;
 };
 
+export const formatDateToDateObject = (date) => dayjs(date).toDate();
+
+export const formatDateToISO = (date) => dayjs(date).toISOString();
+
 export const sortPointByPrice = (point1, point2) => point2.price - point1.price;
 
-export const isFuturePoint = (date) => dayjs(date) - dayjs();
+export const isFuturePoint = (date) => (dayjs(date).diff(dayjs()) >= 0);
 
 export const formatStatisticValue = (type, value) => {
   switch (type) {
