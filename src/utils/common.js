@@ -53,9 +53,9 @@ export const sortPointByTime = (point1, point2) => {
   return pointDuration2 - pointDuration1;
 };
 
-export const formatDateToDateObject = (date) => dayjs(date).toDate();
-
 export const formatDateToISO = (date) => dayjs(date).toISOString();
+
+export const getDefaultDate = () => (formatDateToISO(dayjs()));
 
 export const sortPointByPrice = (point1, point2) => point2.price - point1.price;
 
@@ -68,7 +68,7 @@ export const formatStatisticValue = (type, value) => {
     case StatisticType.TYPE:
       return `${value}x`;
     case StatisticType.TIME:
-      return getTimeDuration(value);
+      return getTimeDuration(0, value);
   }
 };
 

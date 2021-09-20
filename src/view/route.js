@@ -1,31 +1,14 @@
-import {formatDateToDateObject, getRoutePeriod} from '../utils/common';
+import {getRoutePeriod} from '../utils/common';
 import AbstractView from './abstract';
 
 const MAX_POINT_COUNT_IN_ROUTE = 3;
 
 const createRouteTemplate = (points = []) => {
-  const routePoints = [];
-  const startDates = [];
-  const endDates = [];
-  let lastPoint = '';
+  const route = points.length <= MAX_POINT_COUNT_IN_ROUTE
+    ? points.map(({destination}) => destination).join(' — ')
+    : `${points[0].destination}  — ... — ${points[points.length - 1].destination}`;
 
-  points.forEach((point) => {
-    startDates.push(formatDateToDateObject(point.dateStart));
-    endDates.push(formatDateToDateObject(point.dateEnd));
-
-    if (point.destination !== lastPoint) {
-      routePoints.push(point.destination);
-      lastPoint = point.destination;
-
-      return point.destination;
-    }
-  });
-
-  const route = routePoints.length <= MAX_POINT_COUNT_IN_ROUTE
-    ? routePoints.join(' — ')
-    : `${routePoints[0]}  — ... — ${routePoints[routePoints.length - 1]}`;
-
-  const routePeriod = getRoutePeriod(Math.min(...startDates), Math.max(...endDates));
+  const routePeriod = getRoutePeriod(points[0].dateStart, points[points.length - 1].dateEnd);
 
   return `<div class="trip-info__main">
       <h1 class="trip-info__title">${route}</h1>

@@ -1,5 +1,5 @@
 import {POINT_TYPE, DateFormat} from '../const';
-import {formatDate, formatDateToISO} from '../utils/common';
+import {formatDate, formatDateToISO, getDefaultDate} from '../utils/common';
 import SmartView from './smart';
 import flatpickr from 'flatpickr';
 
@@ -8,6 +8,7 @@ import he from 'he';
 
 const DATEPICKER_24HOURS_PARAMETER = 'time_24hr';
 const MIN_PRICE = 0;
+const PRICE_ERROR_MESSAGE = 'The destination value can only be a value from the list.';
 
 const BLANK_POINT = {
   type: POINT_TYPE[0],
@@ -137,15 +138,20 @@ const createPointFormTemplate = (data, allDestinations, allOffers, isNewForm) =>
 };
 
 export default class PointForm extends SmartView {
-  constructor(point = BLANK_POINT, destinations, offers, isNewForm = false) {
+  constructor(point, destinations, offers, isNewForm = false) {
     super();
 
-    this._data = PointForm.parsePointToData(point);
     this._destinations = destinations;
     this._offers = offers;
     this._startDatepicker = null;
     this._endDatepicker = null;
     this._isNewForm = isNewForm;
+
+    if (point === undefined) {
+      point = this._getDefaultPoint();
+    }
+
+    this._data = PointForm.parsePointToData(point);
 
     this._rowClickHandler = this._rowClickHandler.bind(this);
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
@@ -160,6 +166,66 @@ export default class PointForm extends SmartView {
     this._formDeleteClickHandler = this._formDeleteClickHandler.bind(this);
 
     this._setInnerHandlers();
+  }
+
+  getTemplate() {
+    return createPointFormTemplate(this._data, this._destinations, this._offers, this._isNewForm);
+  }
+
+  setRowClickHandler(callback) {
+    this._callback.click = callback;
+    if (!this._isNewForm) {
+      this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._rowClickHandler);
+    }
+  }
+
+  setFormSubmitHandler(callback) {
+    this._callback.submit = callback;
+    this.getElement().querySelector('form').addEventListener('submit', this._formSubmitHandler);
+  }
+
+  setDeleteClickHandler(callback) {
+    this._callback.deleteClick = callback;
+    this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._formDeleteClickHandler);
+  }
+
+  reset(point) {
+    this.updateData(
+      PointForm.parsePointToData(point),
+    );
+  }
+
+  restoreHandlers() {
+    this._setInnerHandlers();
+    this.setRowClickHandler(this._callback.click);
+    this.setFormSubmitHandler(this._callback.submit);
+    this.setDeleteClickHandler(this._callback.deleteClick);
+  }
+
+  removeElement() {
+    super.removeElement();
+
+    if (this._startDatepicker) {
+      this._startDatepicker.destroy();
+      this._startDatepicker = null;
+    }
+
+    if (this._endDatepicker) {
+      this._endDatepicker.destroy();
+      this._endDatepicker = null;
+    }
+  }
+
+  _getDefaultPoint() {
+    return Object.assign(
+      {},
+      BLANK_POINT,
+      {
+        destination: Object.keys(this._destinations)[0],
+        dateStart: getDefaultDate(),
+        dateEnd: getDefaultDate(),
+      },
+    );
   }
 
   _rowClickHandler(evt) {
@@ -287,7 +353,7 @@ export default class PointForm extends SmartView {
     evt.preventDefault();
 
     if (!checkDestination(evt.target.value, this._destinations)) {
-      evt.target.setCustomValidity('The destination value can only be a value from the list.');
+      evt.target.setCustomValidity(PRICE_ERROR_MESSAGE);
       evt.target.reportValidity();
     } else {
       evt.target.setCustomValidity('');
@@ -302,54 +368,6 @@ export default class PointForm extends SmartView {
   _formDeleteClickHandler(evt) {
     evt.preventDefault();
     this._callback.deleteClick(PointForm.parseDataToPoint(this._data));
-  }
-
-  getTemplate() {
-    return createPointFormTemplate(this._data, this._destinations, this._offers, this._isNewForm);
-  }
-
-  setRowClickHandler(callback) {
-    this._callback.click = callback;
-    if (!this._isNewForm) {
-      this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._rowClickHandler);
-    }
-  }
-
-  setFormSubmitHandler(callback) {
-    this._callback.submit = callback;
-    this.getElement().querySelector('form').addEventListener('submit', this._formSubmitHandler);
-  }
-
-  setDeleteClickHandler(callback) {
-    this._callback.deleteClick = callback;
-    this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._formDeleteClickHandler);
-  }
-
-  reset(point) {
-    this.updateData(
-      PointForm.parsePointToData(point),
-    );
-  }
-
-  restoreHandlers() {
-    this._setInnerHandlers();
-    this.setRowClickHandler(this._callback.click);
-    this.setFormSubmitHandler(this._callback.submit);
-    this.setDeleteClickHandler(this._callback.deleteClick);
-  }
-
-  removeElement() {
-    super.removeElement();
-
-    if (this._startDatepicker) {
-      this._startDatepicker.destroy();
-      this._startDatepicker = null;
-    }
-
-    if (this._endDatepicker) {
-      this._endDatepicker.destroy();
-      this._endDatepicker = null;
-    }
   }
 
   static parsePointToData(point) {

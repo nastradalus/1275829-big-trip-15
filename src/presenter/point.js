@@ -71,19 +71,6 @@ export default class Point {
     remove(this._pointFormComponent);
   }
 
-  _replacePointToForm() {
-    replace(this._pointFormComponent, this._pointComponent);
-    document.addEventListener('keydown', this._escKeyDownHandler);
-    this._changeMode();
-    this._mode = Mode.EDITING;
-  }
-
-  _replaceFormToPoint() {
-    replace(this._pointComponent, this._pointFormComponent);
-    document.removeEventListener('keydown', this._escKeyDownHandler);
-    this._mode = Mode.DEFAULT;
-  }
-
   resetView() {
     if (this._mode !== Mode.DEFAULT) {
       this._replaceFormToPoint();
@@ -123,12 +110,17 @@ export default class Point {
     }
   }
 
-  _escKeyDownHandler(evt) {
-    if (evt.key === 'Escape' || evt.key === 'Esc') {
-      evt.preventDefault();
-      this._pointFormComponent.reset(this._point);
-      this._replaceFormToPoint();
-    }
+  _replacePointToForm() {
+    replace(this._pointFormComponent, this._pointComponent);
+    document.addEventListener('keydown', this._escKeyDownHandler);
+    this._changeMode();
+    this._mode = Mode.EDITING;
+  }
+
+  _replaceFormToPoint() {
+    replace(this._pointComponent, this._pointFormComponent);
+    document.removeEventListener('keydown', this._escKeyDownHandler);
+    this._mode = Mode.DEFAULT;
   }
 
   _handleEditClick() {
@@ -174,5 +166,13 @@ export default class Point {
       UpdateType.ALL,
       point,
     );
+  }
+
+  _escKeyDownHandler(evt) {
+    if (evt.key === 'Escape' || evt.key === 'Esc') {
+      evt.preventDefault();
+      this._pointFormComponent.reset(this._point);
+      this._replaceFormToPoint();
+    }
   }
 }

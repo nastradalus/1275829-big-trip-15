@@ -41,6 +41,7 @@ export default class PointNewForm {
 
     remove(this._pointFormComponent);
     this._pointFormComponent = null;
+    this._newEventButton.enable();
 
     document.removeEventListener('keydown', this._escKeyDownHandler);
   }
