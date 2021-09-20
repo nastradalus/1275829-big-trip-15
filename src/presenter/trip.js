@@ -193,7 +193,6 @@ export default class Trip {
   _clearTrip({resetSortType = false, onlyListUpdate = false} = {}) {
     if (this._pointNewFormPresenter) {
       this._pointNewFormPresenter.destroy();
-      this._newEventButton.enable();
     }
 
     remove(this._noPointsComponent);

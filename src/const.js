@@ -30,6 +30,7 @@ export const UpdateType = {
   REMOVE_STATS: 'REMOVE_STATS',
   REMOVE_TABLE: 'REMOVE_TABLE',
   NEW_EVENT: 'NEW_EVENT',
+  FILTER: 'FILTER',
   INIT: 'INIT',
 };
 

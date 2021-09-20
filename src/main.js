@@ -25,7 +25,7 @@ const navigationElement = document.querySelector('.trip-controls__navigation');
 const filtersElement = document.querySelector('.trip-controls__filters');
 const tripEventsElement = document.querySelector('.trip-events');
 const newEventButtonElement = document.querySelector('.trip-main__event-add-btn');
-const statisticContainer = document.querySelector('.page-main .page-body__container');
+const statisticContainerElement = document.querySelector('.page-main .page-body__container');
 
 const newEventButtonAction = {
   enable: () => {
@@ -38,9 +38,9 @@ const newEventButtonAction = {
 
 newEventButtonAction.disable();
 
-const menuPresenter = new MenuPresenter(navigationElement, menuModel);
+const menuPresenter = new MenuPresenter(navigationElement, menuModel, filterModel);
 const filterPresenter = new FilterPresenter(filtersElement, filterModel, pointsModel);
-const tripPresenter = new TripPresenter(mainElement, tripEventsElement, pointsModel, filterModel, menuModel, statisticContainer, newEventButtonAction, api);
+const tripPresenter = new TripPresenter(mainElement, tripEventsElement, pointsModel, filterModel, menuModel, statisticContainerElement, newEventButtonAction, api);
 
 newEventButtonElement.addEventListener('click', (evt) => {
   evt.preventDefault();

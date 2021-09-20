@@ -3,9 +3,10 @@ import {remove, render, RenderPosition, replace} from '../utils/render';
 import MenuView from '../view/menu';
 
 export default class Menu {
-  constructor(menuContainer, menuModel) {
+  constructor(menuContainer, menuModel, filterModel) {
     this._menuContainer = menuContainer;
     this._menuModel = menuModel;
+    this._filterModel = filterModel;
 
     this._menuComponent = null;
 
@@ -42,9 +43,11 @@ export default class Menu {
     switch (menuItem) {
       case MenuItem.TABLE:
         this._menuModel.setMenuItem(UpdateType.REMOVE_STATS, menuItem);
+        this._filterModel.changeAvailability(UpdateType.FILTER, true);
         break;
       case MenuItem.STATS:
         this._menuModel.setMenuItem(UpdateType.REMOVE_TABLE, menuItem);
+        this._filterModel.changeAvailability(UpdateType.FILTER, false);
         break;
     }
   }

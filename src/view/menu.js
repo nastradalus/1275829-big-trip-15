@@ -23,14 +23,14 @@ export default class Menu extends AbstractView {
     return createMenuTemplate(this._activeItem);
   }
 
-  _menuClickHandler(evt) {
-    evt.preventDefault();
-    this._callback.menuClick(evt.target.dataset.item);
-  }
-
   setMenuClickHandler(callback) {
     this._callback.menuClick = callback;
     this.getElement().querySelectorAll('.trip-tabs__btn')
       .forEach((menuItem) => menuItem.addEventListener('click', this._menuClickHandler));
+  }
+
+  _menuClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.menuClick(evt.target.dataset.item);
   }
 }
