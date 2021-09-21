@@ -20,6 +20,14 @@ const BLANK_POINT = {
   isFavorite: false,
 };
 
+const ButtonText = {
+  SAVE: 'Save',
+  SAVING: 'Saving...',
+  DELETE: 'Delete',
+  DELETING: 'Deleting...',
+  CANCEL: 'Cancel',
+};
+
 const createTypeTemplate = () =>
   POINT_TYPE.map((point) => `<div class="event__type-item">
     <input id="event-type-${point.toLowerCase()}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${point}">
@@ -74,6 +82,7 @@ const correctPrice = (price) => +price.replace(/^[0]*/, '');
 const createPointFormTemplate = (data, allDestinations, allOffers, isNewForm) => {
   const {type, destination, dateStart, dateEnd, price, offers} = data;
   const isSubmitDisabled = (!checkDestination(destination, allDestinations) || !dateStart || !dateEnd || !price || data.isDisabled);
+  const resetButtonText = (isNewForm) ? ButtonText.CANCEL : ButtonText.DELETE;
   const arrowTemplate = (!isNewForm)
     ? `<button class="event__rollup-btn" type="button">
          <span class="visually-hidden">Open event</span>
@@ -124,8 +133,8 @@ const createPointFormTemplate = (data, allDestinations, allOffers, isNewForm) =>
           <input class="event__input  event__input--price" id="event-price-1" type="number" min="0" name="event-price" value="${he.encode(price.toString())}">
         </div>
 
-        <button class="event__save-btn btn btn--blue" type="submit" ${isSubmitDisabled ? 'disabled' : ''}>${data.isSaving ? 'Saving...' : 'Save'}</button>
-        <button class="event__reset-btn btn" type="reset" ${data.isDisabled ? 'disabled' : ''}>${data.isDeleting ? 'Deleting...' : 'Delete'}</button>
+        <button class="event__save-btn btn btn--blue" type="submit" ${isSubmitDisabled ? 'disabled' : ''}>${data.isSaving ? ButtonText.SAVING : ButtonText.SAVE}</button>
+        <button class="event__reset-btn btn" type="reset" ${data.isDisabled ? 'disabled' : ''}>${(data.isDeleting) ? ButtonText.DELETING : resetButtonText}</button>
         ${arrowTemplate}
       </header>
       <section class="event__details">

@@ -32,6 +32,39 @@ export default class Point {
     this._handleEditClose = this._handleEditClose.bind(this);
   }
 
+  setViewState(state) {
+    if (this._mode === Mode.DEFAULT) {
+      return;
+    }
+
+    const resetFormState = () => {
+      this._pointFormComponent.updateData({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    switch (state) {
+      case State.SAVING:
+        this._pointFormComponent.updateData({
+          isDisabled: true,
+          isSaving: true,
+        });
+        break;
+      case State.DELETING:
+        this._pointFormComponent.updateData({
+          isDisabled: true,
+          isDeleting: true,
+        });
+        break;
+      case State.ABORTING:
+        this._pointComponent.shake(resetFormState);
+        this._pointFormComponent.shake(resetFormState);
+        break;
+    }
+  }
+
   init(point, destinations, offers) {
     this._point = point;
     this._destinations = destinations;
@@ -74,39 +107,6 @@ export default class Point {
   resetView() {
     if (this._mode !== Mode.DEFAULT) {
       this._replaceFormToPoint();
-    }
-  }
-
-  setViewState(state) {
-    if (this._mode === Mode.DEFAULT) {
-      return;
-    }
-
-    const resetFormState = () => {
-      this._pointFormComponent.updateData({
-        isDisabled: false,
-        isSaving: false,
-        isDeleting: false,
-      });
-    };
-
-    switch (state) {
-      case State.SAVING:
-        this._pointFormComponent.updateData({
-          isDisabled: true,
-          isSaving: true,
-        });
-        break;
-      case State.DELETING:
-        this._pointFormComponent.updateData({
-          isDisabled: true,
-          isDeleting: true,
-        });
-        break;
-      case State.ABORTING:
-        this._pointComponent.shake(resetFormState);
-        this._pointFormComponent.shake(resetFormState);
-        break;
     }
   }
 
